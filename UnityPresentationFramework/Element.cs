@@ -12,7 +12,7 @@ namespace UnityPresentationFramework
     {
         private readonly List<Element> children = new List<Element>();
 
-        public Element? Parent { get; private set; }
+        public virtual Element? Parent { get; protected set; }
 
         protected virtual void ChildNeedsRedraw(Element child) 
         {
@@ -36,8 +36,8 @@ namespace UnityPresentationFramework
 
         public virtual void Add(Element item)
         {
-            children.Add(item);
             item.Parent = this;
+            children.Add(item);
         }
 
         public virtual void Clear()

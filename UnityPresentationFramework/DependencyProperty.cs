@@ -17,7 +17,8 @@ namespace UnityPresentationFramework
             )
             where TOwningType : Element
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+            return new DependencyProperty<TValueType>();
         }
         public static DependencyProperty<TValueType> RegisterAttached<TOwningType, TValueType>(
                 string name,
@@ -27,7 +28,8 @@ namespace UnityPresentationFramework
             )
             where TOwningType : Element
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+            return new DependencyProperty<TValueType>();
         }
     }
 

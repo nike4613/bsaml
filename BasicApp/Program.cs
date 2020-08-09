@@ -1,12 +1,20 @@
 ﻿using System;
+using UnityPresentationFramework;
 
 namespace BasicApp
 {
-    class Program
+    public class Program
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            var obj = DynamicParser.ParseXaml(Xaml);
         }
+
+        const string Xaml = @"
+<ExampleElement xmlns=""upf""
+                xmlns:a=""clr-namespace:BasicApp;assembly=BasicApp"">
+    <ExampleElement />
+</ExampleElement>
+";
     }
 }

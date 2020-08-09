@@ -7,14 +7,20 @@
     <Nullable>enable</Nullable>
     <WarningsAsErrors>CS8600;CS8601;CS8602;CS8603;CS8604;CS8618;CS8625;CS8762</WarningsAsErrors>
 
-    <CopyRefAssembliesToPublishDirectory>true</CopyRefAssembliesToPublishDirectory>
+    <ILMergeTransitive>true</ILMergeTransitive>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="ILMerge" Version="3.0.41" />
+    <PackageReference Include="ILMerge.MSBuild.Task" Version="1.0.7" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.6" />
     <PackageReference Include="Serilog" Version="2.9.0" />
     <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Xaml" />
   </ItemGroup>
 
 </Project>
