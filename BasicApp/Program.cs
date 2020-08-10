@@ -12,8 +12,12 @@ namespace BasicApp
 
         const string Xaml = @"
 <ExampleElement xmlns=""upf""
-                xmlns:a=""clr-namespace:BasicApp;assembly=BasicApp"">
-    <ExampleElement />
+                xmlns:a=""clr-namespace:BasicApp;assembly=BasicApp""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml""
+                DataContext=""17"">
+    <ExampleElement Text=""{Binding DoTheThing}""/>
+    <ExampleElement Text=""{Binding FirstThing.Thing}""/>
+    <ExampleElement Text=""{Binding Thing}"" DataContext=""{Binding FirstThing}""/>
 </ExampleElement>
 ";
     }

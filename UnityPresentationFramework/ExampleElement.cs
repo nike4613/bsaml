@@ -7,7 +7,7 @@ namespace UnityPresentationFramework
     public class ExampleElement : Element<ExampleElement>
     {
         public static readonly DependencyProperty<string> TextProperty = 
-            Properties.Register(nameof(Text), "", (p, e, v) => e.TextChanged(v));
+            Properties.Register(nameof(Text), "", (e, v) => e.TextChanged(v));
 
         public static readonly DependencyProperty<bool> ScrollTargetProperty =
             Properties.RegisterAttached("ScrollTarget", false);

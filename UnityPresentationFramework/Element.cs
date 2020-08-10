@@ -12,7 +12,19 @@ namespace UnityPresentationFramework
     {
         private readonly List<Element> children = new List<Element>();
 
-        public virtual Element? Parent { get; protected set; }
+        public object? DataContext { get; set; }
+
+        private Element? _parent = null;
+        public virtual Element? Parent 
+        { 
+            get => _parent;
+            protected set
+            {
+                if (ReferenceEquals(DataContext, _parent?.DataContext))
+                    DataContext = value?.DataContext;
+                _parent = value;
+            }
+        }
 
         protected virtual void ChildNeedsRedraw(Element child) 
         {
