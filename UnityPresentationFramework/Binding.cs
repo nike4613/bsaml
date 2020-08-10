@@ -36,8 +36,10 @@ namespace UnityPresentationFramework
                 Source ??= element.DataContext;
             }
 
-            if (Source is null)
-                throw new InvalidOperationException("Cannot bind to a property on a null source");
+            // TODO: how do I make this work sanely?
+
+            /*if (Source is null)
+                throw new InvalidOperationException("Cannot bind to a property on a null source");*/
 
             return null!;
         }
