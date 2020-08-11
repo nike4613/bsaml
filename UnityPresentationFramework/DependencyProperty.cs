@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 
@@ -10,6 +11,9 @@ namespace UnityPresentationFramework
 
     public abstract class DependencyProperty
     {
+        private static readonly object syncObject = new object();
+        private static readonly Dictionary<(Type Owner, string Name), DependencyProperty> properties = new Dictionary<(Type, string), DependencyProperty>();
+
         public static DependencyProperty<TValueType> Register<TOwningType, TValueType>(
                 string name,
                 TValueType defaultValue,
@@ -18,7 +22,19 @@ namespace UnityPresentationFramework
             )
             where TOwningType : DependencyObject
         {
-            return new DependencyProperty<TOwningType, TValueType>(name, defaultValue, onChange, validate);
+            var key = (type: typeof(TOwningType), name);
+
+            lock (syncObject)
+            {
+                if (properties.ContainsKey(key))
+                    throw new ArgumentException($"Property '{name}' already registered on {key.type.Name}");
+
+                var prop = new DependencyProperty<TOwningType, TValueType>(name, defaultValue, onChange, validate);
+
+                properties.Add(key, prop);
+
+                return prop;
+            }
         }
         public static DependencyProperty<TValueType> RegisterAttached<TOwningType, TValueType>(
                 string name,
@@ -28,7 +44,40 @@ namespace UnityPresentationFramework
             )
             where TOwningType : DependencyObject
         {
-            return new DependencyProperty<TOwningType, TValueType>(name, defaultValue, onChange, validate);
+            var key = (type: typeof(TOwningType), name);
+
+            lock (syncObject)
+            {
+                if (properties.ContainsKey(key))
+                    throw new ArgumentException($"Property '{name}' already registered on {key.type.Name}");
+
+                var prop = new DependencyProperty<TOwningType, TValueType>(name, defaultValue, onChange, validate);
+
+                properties.Add(key, prop);
+
+                return prop;
+            }
+        }
+
+        internal static DependencyProperty? FromName(string name, Type owner)
+        {
+            Type? ownerType = owner;
+            DependencyProperty? prop = null;
+            while (prop == null)
+            {
+                if (ownerType is null) break;
+
+                RuntimeHelpers.RunClassConstructor(ownerType.TypeHandle);
+
+                lock (syncObject)
+                {
+                    if (!properties.TryGetValue((ownerType, name), out prop))
+                        prop = null;
+                }
+
+                ownerType = ownerType.BaseType;
+            }
+            return prop;
         }
 
         public string Name { get; }
