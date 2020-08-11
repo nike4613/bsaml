@@ -6,9 +6,18 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows.Markup;
 using System.Xaml;
+using System.Reflection;
 
 namespace UnityPresentationFramework
 {
+    public interface IBinding
+    {
+        public object? Source { get; }
+
+        // TODO: figure out a better abstraction for a path like this
+        public string Path { get; }
+    }
+
     [XamlSetMarkupExtension(nameof(HandleBindingSet))]
     public class Binding : MarkupExtension
     {
@@ -36,17 +45,66 @@ namespace UnityPresentationFramework
                 Source ??= element.DataContext;
             }
 
-            // TODO: how do I make this work sanely?
+            Type propType;
+            var prop = targets.TargetProperty;
+            if (prop is PropertyInfo propInfo)
+            {
+                propType = propInfo.PropertyType;
+            }
+            else if (prop is FieldInfo field)
+            {
+                propType = field.FieldType;
+            }
+            else if (prop is DependencyProperty depProp)
+            {
+                propType = depProp.PropertyType;
+            }
+            else
+            {
+                throw new InvalidOperationException("Unknown type of property");
+            }
 
-            /*if (Source is null)
-                throw new InvalidOperationException("Cannot bind to a property on a null source");*/
+            object result;
+            if (propType.IsConstructedGenericType && propType.GetGenericTypeDefinition() == typeof(Bindable<>))
+            {
+                var type = propType.GetGenericArguments().First();
+                var bindingType = typeof(Binding<>).MakeGenericType(type);
+                var ctor = bindingType.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, new[] { typeof(Binding) }, Array.Empty<ParameterModifier>());
+                result = ctor.Invoke(new[] { this });
+            }
+            else if (propType == typeof(object))
+            {
+                result = new Binding<object>(this);
+            }
+            else
+            {
+                throw new InvalidOperationException("Cannot bind to a non-Bindable property");
+            }
 
-            return null!;
+            return result;
         }
 
         internal static void HandleBindingSet(object? sender, XamlSetMarkupExtensionEventArgs args)
         {
 
         }
+    }
+
+    public class Binding<T> : Bindable<T>, IBinding
+    {
+        public override T Value => throw new NotImplementedException();
+
+        public object? Source { get; }
+
+        public string Path { get; }
+
+        internal Binding(Binding bind)
+        {
+            Source = bind.Source;
+            Path = bind.Path;
+        }
+
+        public static implicit operator Binding<T>(Binding b)
+            => new Binding<T>(b);
     }
 }
