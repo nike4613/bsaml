@@ -34,7 +34,8 @@ namespace UnityPresentationFramework
             if (!prop.ValidateValue(this, value))
                 throw new InvalidOperationException("Invalid property value");
 
-            SetInternal(prop, value);
+            SetInternal(prop, value, false);
+            prop.ValueChanged(this, value);
         }
 
         private readonly Dictionary<Guid, object?> propertyValues = new Dictionary<Guid, object?>();
@@ -50,9 +51,11 @@ namespace UnityPresentationFramework
             return value;
         }
 
-        private void SetInternal(DependencyProperty prop, object? value)
+        private void SetInternal(DependencyProperty prop, object? value, bool invokeChanged = true)
         {
             propertyValues[prop.Guid] = value;
+            if (invokeChanged)
+                prop.ValueChanged(this, value);
         }
     }
 }
