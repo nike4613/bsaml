@@ -9,6 +9,25 @@ namespace UnityPresentationFramework
     public delegate bool ValidateValue<in TOwner, in T>(TOwner owner, T value) where TOwner : DependencyObject;
     public delegate void PropertyChanged<in TOwner, in T>(TOwner owner, T value) where TOwner : DependencyObject;
 
+    public struct DependencyMetadata
+    {
+        [Flags]
+        private enum Flags : byte
+        {
+            None = 0,
+            InheritsParent = 0x01,
+
+            _All = 0xFF,
+        }
+
+        private Flags flags;
+        public bool InheritsFromParent
+        {
+            get => 0 != (flags & Flags.InheritsParent);
+            set => flags = (flags & ~Flags.InheritsParent) | (value ? Flags.InheritsParent : 0);
+        }
+    }
+
     public abstract class DependencyProperty
     {
         private static readonly object syncObject = new object();
@@ -18,7 +37,8 @@ namespace UnityPresentationFramework
                 string name,
                 TValueType defaultValue,
                 PropertyChanged<TOwningType, TValueType>? onChange = null,
-                ValidateValue<TOwningType, TValueType>? validate = null
+                ValidateValue<TOwningType, TValueType>? validate = null,
+                DependencyMetadata metadata = default
             )
             where TOwningType : DependencyObject
         {
@@ -29,7 +49,7 @@ namespace UnityPresentationFramework
                 if (properties.ContainsKey(key))
                     throw new ArgumentException($"Property '{name}' already registered on {key.type.Name}");
 
-                var prop = new DependencyProperty<TOwningType, TValueType>(name, defaultValue, onChange, validate);
+                var prop = new DependencyProperty<TOwningType, TValueType>(name, defaultValue, onChange, validate, metadata);
 
                 properties.Add(key, prop);
 
@@ -40,7 +60,8 @@ namespace UnityPresentationFramework
                 string name,
                 TValueType defaultValue,
                 PropertyChanged<DependencyObject, TValueType>? onChange = null,
-                ValidateValue<DependencyObject, TValueType>? validate = null
+                ValidateValue<DependencyObject, TValueType>? validate = null,
+                DependencyMetadata metadata = default
             )
             where TOwningType : DependencyObject
         {
@@ -51,7 +72,7 @@ namespace UnityPresentationFramework
                 if (properties.ContainsKey(key))
                     throw new ArgumentException($"Property '{name}' already registered on {key.type.Name}");
 
-                var prop = new DependencyProperty<TOwningType, TValueType>(name, defaultValue, onChange, validate);
+                var prop = new DependencyProperty<TOwningType, TValueType>(name, defaultValue, onChange, validate, metadata);
 
                 properties.Add(key, prop);
 
@@ -89,12 +110,17 @@ namespace UnityPresentationFramework
 
         public object? DefaultValue { get; }
 
-        protected DependencyProperty(string name, bool isAttached, object? defaultValue)
+        public bool IsInherited => Metadata.InheritsFromParent;
+
+        protected DependencyMetadata Metadata { get; }
+
+        protected DependencyProperty(string name, bool isAttached, object? defaultValue, DependencyMetadata metadata)
         {
             Name = name;
             IsAttached = isAttached;
             Guid = Guid.NewGuid();
             DefaultValue = defaultValue;
+            Metadata = metadata;
         }
 
         public abstract bool ValidateValue(DependencyObject target, object? value);
@@ -105,7 +131,8 @@ namespace UnityPresentationFramework
 
     public abstract class DependencyProperty<T> : DependencyProperty
     {
-        protected DependencyProperty(string name, bool isAttached, T defaultValue) : base(name, isAttached, defaultValue)
+        protected DependencyProperty(string name, bool isAttached, T defaultValue, DependencyMetadata metadata) 
+            : base(name, isAttached, defaultValue, metadata)
         {
             DefaultValue = defaultValue;
         }
@@ -158,8 +185,9 @@ namespace UnityPresentationFramework
             string name,
             T defaultValue,
             PropertyChanged<TOwner, T>? onChanged,
-            ValidateValue<TOwner, T>? validate
-        ) : base(name, false, defaultValue)
+            ValidateValue<TOwner, T>? validate,
+            DependencyMetadata metadata
+        ) : base(name, false, defaultValue, metadata)
         {
             this.onChanged = onChanged;
             this.validate = validate;
@@ -169,8 +197,9 @@ namespace UnityPresentationFramework
             string name,
             T defaultValue,
             PropertyChanged<DependencyObject, T>? onChanged,
-            ValidateValue<DependencyObject, T>? validate
-        ) : base(name, true, defaultValue)
+            ValidateValue<DependencyObject, T>? validate,
+            DependencyMetadata metadata
+        ) : base(name, true, defaultValue, metadata)
         {
             this.onChanged = onChanged;
             this.validate = validate;

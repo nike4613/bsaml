@@ -6,6 +6,8 @@ namespace UnityPresentationFramework
 {
     public abstract class DependencyObject
     {
+        protected virtual DependencyObject? ParentObject => null;
+
         public object? GetValue(DependencyProperty prop)
         {
             if (!prop.IsValidTarget(this))
@@ -40,9 +42,28 @@ namespace UnityPresentationFramework
 
         private readonly Dictionary<Guid, object?> propertyValues = new Dictionary<Guid, object?>();
 
+        private bool TryGetValue(DependencyProperty prop, out object? value)
+            => propertyValues.TryGetValue(prop.Guid, out value);
+
         private object? GetInternal(DependencyProperty prop)
         {
-            if (!propertyValues.TryGetValue(prop.Guid, out var value))
+            bool valueFound = false;
+            object? value = null;
+            var current = this;
+
+            if (prop.IsInherited)
+            {
+                while (current != null && !(valueFound = current.TryGetValue(prop, out value)))
+                {
+                    current = current.ParentObject;
+                }
+            }
+            else
+            {
+                valueFound = TryGetValue(prop, out value);
+            }
+
+            if (!valueFound)
             {
                 value = prop.DefaultValue;
                 propertyValues.Add(prop.Guid, value);

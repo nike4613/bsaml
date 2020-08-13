@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using UnityPresentationFramework;
 
 namespace BasicApp
@@ -8,6 +9,8 @@ namespace BasicApp
         static void Main(string[] args)
         {
             var obj = DynamicParser.ParseXaml(Xaml);
+
+            var dataCtx = obj.First().DataContext;
         }
 
         const string Xaml = @"

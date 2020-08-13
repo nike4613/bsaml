@@ -12,19 +12,19 @@ namespace UnityPresentationFramework
     {
         private readonly List<Element> children = new List<Element>();
 
-        public object? DataContext { get; set; }
+        public static readonly DependencyProperty<object?> DataContextProperty =
+            DependencyProperty.Register<Element, object?>(nameof(DataContext), null,
+                metadata: new DependencyMetadata { InheritsFromParent = true });
 
-        private Element? _parent = null;
-        public virtual Element? Parent 
-        { 
-            get => _parent;
-            protected set
-            {
-                if (ReferenceEquals(DataContext, _parent?.DataContext))
-                    DataContext = value?.DataContext;
-                _parent = value;
-            }
+        public object? DataContext
+        {
+            get => GetValue(DataContextProperty);
+            set => SetValue(DataContextProperty, value);
         }
+
+        protected override sealed DependencyObject? ParentObject => Parent;
+
+        public virtual Element? Parent { get; set; }
 
         protected virtual void ChildNeedsRedraw(Element child) 
         {

@@ -30,7 +30,7 @@ namespace UnityPresentationFramework
             Path = path;
         }
 
-        public override object ProvideValue(IServiceProvider serviceProvider)
+        public override object? ProvideValue(IServiceProvider serviceProvider)
         {
             var targets = serviceProvider.GetService<IProvideValueTarget>();
             var schema = serviceProvider.GetService<IXamlSchemaContextProvider>().SchemaContext;
@@ -39,11 +39,6 @@ namespace UnityPresentationFramework
 
             if (!(targetObject is DependencyObject depObject))
                 throw new InvalidOperationException("A binding cannot be added where there is no DependencyObject");
-
-            if (depObject is Element element)
-            {
-                Source ??= element.DataContext;
-            }
 
             Type propType;
             var prop = targets.TargetProperty;
@@ -64,47 +59,12 @@ namespace UnityPresentationFramework
                 throw new InvalidOperationException("Unknown type of property");
             }
 
-            object result;
-            if (propType.IsConstructedGenericType && propType.GetGenericTypeDefinition() == typeof(Bindable<>))
-            {
-                var type = propType.GetGenericArguments().First();
-                var bindingType = typeof(Binding<>).MakeGenericType(type);
-                var ctor = bindingType.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, new[] { typeof(Binding) }, Array.Empty<ParameterModifier>());
-                result = ctor.Invoke(new[] { this });
-            }
-            else if (propType == typeof(object))
-            {
-                result = new Binding<object>(this);
-            }
-            else
-            {
-                throw new InvalidOperationException("Cannot bind to a non-Bindable property");
-            }
-
-            return result;
+            return null;
         }
 
         internal static void HandleBindingSet(object? sender, XamlSetMarkupExtensionEventArgs args)
         {
 
         }
-    }
-
-    public class Binding<T> : Bindable<T>, IBinding
-    {
-        public override T Value => throw new NotImplementedException();
-
-        public object? Source { get; }
-
-        public string Path { get; }
-
-        internal Binding(Binding bind)
-        {
-            Source = bind.Source;
-            Path = bind.Path;
-        }
-
-        public static implicit operator Binding<T>(Binding b)
-            => new Binding<T>(b);
     }
 }
