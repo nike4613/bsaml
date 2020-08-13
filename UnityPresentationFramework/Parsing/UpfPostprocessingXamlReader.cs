@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xaml;
@@ -60,6 +61,9 @@ namespace UnityPresentationFramework.Parsing
             return result;
         }
 
+        private readonly Dictionary<Type, XamlType> ownerTypeCache = new Dictionary<Type, XamlType>();
+        private readonly ConditionalWeakTable<DependencyProperty, UpfXamlPropertyMember> propCache = new ConditionalWeakTable<DependencyProperty, UpfXamlPropertyMember>();
+
         private XamlMember TransformMember(XamlMember member)
         {
             var declType = member.DeclaringType;
@@ -69,7 +73,13 @@ namespace UnityPresentationFramework.Parsing
             var depProp = DependencyProperty.FromName(name, declType.UnderlyingType);
             if (depProp != null)
             {
-                return new UpfXamlPropertyMember(depProp, new XamlType(depProp.OwningType, schemaContext), dependencyObjectType);
+                if (!propCache.TryGetValue(depProp, out var uMember))
+                {
+                    if (!ownerTypeCache.TryGetValue(depProp.OwningType, out var xamlType))
+                        ownerTypeCache.Add(depProp.OwningType, xamlType = new XamlType(depProp.OwningType, schemaContext));
+                    propCache.Add(depProp, uMember = new UpfXamlPropertyMember(depProp, xamlType, dependencyObjectType));
+                }
+                return uMember;
             }
 
             return member;

@@ -21,8 +21,6 @@ namespace UnityPresentationFramework
     [XamlSetMarkupExtension(nameof(HandleBindingSet))]
     public class Binding : MarkupExtension
     {
-        public object? Source { get; set; } = null;
-
         public string Path { get; set; }
 
         public Binding(string path)
