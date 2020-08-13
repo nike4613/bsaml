@@ -7,20 +7,23 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Windows.Markup;
 using System.Xaml;
 using System.Reflection;
+using System.Diagnostics;
 
 namespace UnityPresentationFramework
 {
-    public interface IBinding
+    public enum BindingDirection
     {
-        public object? Source { get; }
-
-        // TODO: figure out a better abstraction for a path like this
-        public string Path { get; }
+        OneWay = 0x1,
+        TwoWay = OneWay | OneWayToSource,
+        OneWayToSource = 0x2,
     }
 
     [XamlSetMarkupExtension(nameof(HandleBindingSet))]
+    [DebuggerDisplay("\\{Binding {Path,nq}, Direction={Direction}\\}")]
     public class Binding : MarkupExtension
     {
+        public BindingDirection Direction { get; set; } = BindingDirection.OneWay;
+
         public string Path { get; set; }
 
         public Binding(string path)
@@ -41,7 +44,14 @@ namespace UnityPresentationFramework
             if (!(targets.TargetProperty is DependencyProperty prop))
                 throw new InvalidOperationException("Cannot bind to a property that is not a DependencyProperty");
 
+            depObject.RegisterBinding(this, prop);
+
             return this;
+        }
+
+        internal void Refresh(DependencyObject obj, DependencyProperty toProp)
+        {
+
         }
 
         internal static void HandleBindingSet(object? sender, XamlSetMarkupExtensionEventArgs args)

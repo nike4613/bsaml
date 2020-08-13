@@ -40,15 +40,44 @@ namespace UnityPresentationFramework
             prop.ValueChanged(this, value);
         }
 
-        protected virtual void RequestBindingRefresh()
+        internal void ResetAllValues()
         {
-            // TODO:
+            allBindings.Clear();
+            inBindings.Clear();
+            outBindings.Clear();
+            propertyValues.Clear();
         }
 
-        private readonly Dictionary<Guid, object?> propertyValues = new Dictionary<Guid, object?>();
+        private readonly Dictionary<Binding, DependencyProperty> allBindings = new Dictionary<Binding, DependencyProperty>();
+        private readonly Dictionary<DependencyProperty, Binding> inBindings = new Dictionary<DependencyProperty, Binding>();
+        private readonly Dictionary<DependencyProperty, Binding> outBindings = new Dictionary<DependencyProperty, Binding>();
+
+        internal void RegisterBinding(Binding binding, DependencyProperty prop)
+        {
+            if ((binding.Direction & BindingDirection.OneWay) != 0)
+            {
+                inBindings.Add(prop, binding);
+            }
+            if ((binding.Direction & BindingDirection.OneWayToSource) != 0)
+            {
+                outBindings.Add(prop, binding);
+            }
+            allBindings.Add(binding, prop);
+        }
+
+        protected virtual void RequestBindingRefresh()
+        {
+            // TODO: make this queue to some dispatcher
+            foreach (var kvp in allBindings)
+            {
+                kvp.Key.Refresh(this, kvp.Value);
+            }
+        }
+
+        private readonly Dictionary<DependencyProperty, object?> propertyValues = new Dictionary<DependencyProperty, object?>();
 
         private bool TryGetValue(DependencyProperty prop, out object? value)
-            => propertyValues.TryGetValue(prop.Guid, out value);
+            => propertyValues.TryGetValue(prop, out value);
 
         private object? GetInternal(DependencyProperty prop)
         {
@@ -71,7 +100,7 @@ namespace UnityPresentationFramework
             if (!valueFound)
             {
                 value = prop.DefaultValue;
-                propertyValues.Add(prop.Guid, value);
+                propertyValues.Add(prop, value);
             }
 
             return value;
@@ -79,7 +108,12 @@ namespace UnityPresentationFramework
 
         private void SetInternal(DependencyProperty prop, object? value, bool invokeChanged = true)
         {
-            propertyValues[prop.Guid] = value;
+            propertyValues[prop] = value;
+            if (outBindings.TryGetValue(prop, out var binding))
+            {
+                // TODO: implement this as a potentially queued item to be executed soon
+                binding.Refresh(this, prop); // this should then propagate it up if needed
+            }
             if (invokeChanged)
                 prop.ValueChanged(this, value);
         }

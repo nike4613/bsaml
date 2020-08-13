@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
@@ -9,6 +10,7 @@ namespace UnityPresentationFramework
     public delegate bool ValidateValue<in TOwner, in T>(TOwner owner, T value) where TOwner : DependencyObject;
     public delegate void PropertyChanged<in TOwner, in T>(TOwner owner, T value) where TOwner : DependencyObject;
 
+    [DebuggerDisplay("{flags}")]
     public struct DependencyMetadata
     {
         [Flags]
@@ -28,6 +30,7 @@ namespace UnityPresentationFramework
         }
     }
 
+    [DebuggerDisplay("{PropertyType.FullName,nq} {Name,nq} \\{IsAttached={IsAttached}, Owner={OwningType.FullName,nq}\\}")]
     public abstract class DependencyProperty
     {
         private static readonly object syncObject = new object();
@@ -106,8 +109,6 @@ namespace UnityPresentationFramework
         public abstract Type PropertyType { get; }
         public abstract Type OwningType { get; }
 
-        public Guid Guid { get; }
-
         public object? DefaultValue { get; }
 
         public bool IsInherited => Metadata.InheritsFromParent;
@@ -118,7 +119,6 @@ namespace UnityPresentationFramework
         {
             Name = name;
             IsAttached = isAttached;
-            Guid = Guid.NewGuid();
             DefaultValue = defaultValue;
             Metadata = metadata;
         }
@@ -129,6 +129,7 @@ namespace UnityPresentationFramework
         public abstract bool IsValidTarget(DependencyObject target);
     }
 
+    [DebuggerDisplay("{PropertyType.FullName,nq} {Name,nq} \\{IsAttached={IsAttached}, Owner={OwningType.FullName,nq}\\}")]
     public abstract class DependencyProperty<T> : DependencyProperty
     {
         protected DependencyProperty(string name, bool isAttached, T defaultValue, DependencyMetadata metadata) 
@@ -167,6 +168,7 @@ namespace UnityPresentationFramework
         }
     }
 
+    [DebuggerDisplay("{PropertyType.FullName,nq} {Name,nq} \\{IsAttached={IsAttached}, Owner={OwningType.FullName,nq}\\}")]
     public class DependencyProperty<TOwner, T> : DependencyProperty<T>
         where TOwner : DependencyObject
     {
