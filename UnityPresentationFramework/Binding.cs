@@ -40,26 +40,10 @@ namespace UnityPresentationFramework
             if (!(targetObject is DependencyObject depObject))
                 throw new InvalidOperationException("A binding cannot be added where there is no DependencyObject");
 
-            Type propType;
-            var prop = targets.TargetProperty;
-            if (prop is PropertyInfo propInfo)
-            {
-                propType = propInfo.PropertyType;
-            }
-            else if (prop is FieldInfo field)
-            {
-                propType = field.FieldType;
-            }
-            else if (prop is DependencyProperty depProp)
-            {
-                propType = depProp.PropertyType;
-            }
-            else
-            {
-                throw new InvalidOperationException("Unknown type of property");
-            }
+            if (!(targets.TargetProperty is DependencyProperty prop))
+                throw new InvalidOperationException("Cannot bind to a property that is not a DependencyProperty");
 
-            return null;
+            return this;
         }
 
         internal static void HandleBindingSet(object? sender, XamlSetMarkupExtensionEventArgs args)

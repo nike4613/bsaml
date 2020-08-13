@@ -8,11 +8,6 @@ namespace UnityPresentationFramework
     {
         protected virtual DependencyObject? ParentObject => null;
 
-        protected virtual void RequestBindingRefresh()
-        {
-            // TODO:
-        }
-
         public object? GetValue(DependencyProperty prop)
         {
             if (!prop.IsValidTarget(this))
@@ -43,6 +38,11 @@ namespace UnityPresentationFramework
 
             SetInternal(prop, value, false);
             prop.ValueChanged(this, value);
+        }
+
+        protected virtual void RequestBindingRefresh()
+        {
+            // TODO:
         }
 
         private readonly Dictionary<Guid, object?> propertyValues = new Dictionary<Guid, object?>();

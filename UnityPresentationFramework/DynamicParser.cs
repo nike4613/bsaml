@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Markup;
 using System.Xaml;
 using System.Xml;
+using UnityPresentationFramework.Parsing;
 
 [assembly: XmlnsDefinition("upf", nameof(UnityPresentationFramework))]
 
@@ -32,11 +33,12 @@ namespace UnityPresentationFramework
             return ReadFromReader(xreader);
         }
 
-        private static Element ReadFromReader(XamlXmlReader xreader)
+        private static Element ReadFromReader(XamlReader xreader)
         {
-            using var objWriter = new XamlObjectWriter(xreader.SchemaContext, new XamlObjectWriterSettings { });
+            var realReader = new UpfPostprocessingXamlReader(xreader);
+            using var objWriter = new XamlObjectWriter(realReader.SchemaContext, new XamlObjectWriterSettings { });
 
-            XamlServices.Transform(xreader, objWriter);
+            XamlServices.Transform(realReader, objWriter);
 
             var result = objWriter.Result as Element;
             if (result == null)

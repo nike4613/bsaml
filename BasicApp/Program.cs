@@ -21,7 +21,7 @@ namespace BasicApp
     <ExampleElement Text=""{Binding DoTheThing}"" DataContext=""17"">
         <ExampleElement Text=""{Binding DataContextIsInherited}""/>
     </ExampleElement>
-    <ExampleElement Text=""{Binding FirstThing.Thing}""/>
+    <ExampleElement Text=""{Binding FirstThing.Thing}"" ExampleElement.ScrollTarget=""true""/>
     <ExampleElement Text=""{Binding Thing}"" DataContext=""{Binding FirstThing}""/>
 </ExampleElement>
 ";
