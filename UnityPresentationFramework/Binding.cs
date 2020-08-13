@@ -25,7 +25,7 @@ namespace UnityPresentationFramework
     {
         public BindingDirection Direction { get; set; } = BindingDirection.OneWay;
 
-        public string Path { get; set; }
+        public string Path { get; }
 
         public Binding(string path)
         {

@@ -11,10 +11,10 @@ namespace UnityPresentationFramework
     {
         public Type MemberType(Type type, string member)
         {
-            var prop = type.GetProperty(member, BindingFlags.Public | BindingFlags.Instance);
+            var prop = type.GetProperty(member, BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
             if (prop != null)
                 return prop.PropertyType;
-            var field = type.GetField(member, BindingFlags.Public | BindingFlags.Instance);
+            var field = type.GetField(member, BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
             if (field != null)
                 return field.FieldType;
 
@@ -23,10 +23,10 @@ namespace UnityPresentationFramework
 
         public ValueGetter FindGetter(Type type, string member)
         {
-            var prop = type.GetProperty(member, BindingFlags.Public | BindingFlags.Instance);
+            var prop = type.GetProperty(member, BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
             if (prop != null)
                 return GetterForProperty(prop);
-            var field = type.GetField(member, BindingFlags.Public | BindingFlags.Instance);
+            var field = type.GetField(member, BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
             if (field != null)
                 return GetterForField(field);
 
@@ -35,10 +35,10 @@ namespace UnityPresentationFramework
 
         public ValueSetter FindSetter(Type type, string member)
         {
-            var prop = type.GetProperty(member, BindingFlags.Public | BindingFlags.Instance);
+            var prop = type.GetProperty(member, BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
             if (prop != null)
                 return SetterForProperty(prop);
-            var field = type.GetField(member, BindingFlags.Public | BindingFlags.Instance);
+            var field = type.GetField(member, BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
             if (field != null)
                 return SetterForField(field);
 

@@ -8,6 +8,17 @@ namespace UnityPresentationFramework
     {
         protected virtual DependencyObject? ParentObject => null;
 
+        public static readonly DependencyProperty<object?> DataContextProperty =
+            DependencyProperty.Register<DependencyObject, object?>(nameof(DataContext), null,
+                onChange: (e, v) => e.RequestBindingRefresh(true),
+                metadata: new DependencyMetadata { InheritsFromParent = true });
+
+        public object? DataContext
+        {
+            get => GetValue(DataContextProperty);
+            set => SetValue(DataContextProperty, value);
+        }
+
         public object? GetValue(DependencyProperty prop)
         {
             if (!prop.IsValidTarget(this))
@@ -65,13 +76,21 @@ namespace UnityPresentationFramework
             allBindings.Add(binding, prop);
         }
 
-        protected virtual void RequestBindingRefresh()
+        protected virtual void RequestBindingRefresh(bool includeOut)
         {
             // TODO: make this queue to some dispatcher
-            foreach (var kvp in allBindings)
+            foreach (var kvp in inBindings)
             {
-                kvp.Key.Refresh(this, kvp.Value);
+                kvp.Value.Refresh(this, kvp.Key, false);
             }
+
+            if (includeOut)
+            {
+                foreach (var kvp in outBindings)
+                {
+                    kvp.Value.Refresh(this, kvp.Key, true);
+                }
+            }    
         }
 
         private readonly Dictionary<DependencyProperty, object?> propertyValues = new Dictionary<DependencyProperty, object?>();
@@ -112,7 +131,7 @@ namespace UnityPresentationFramework
             if (outBindings.TryGetValue(prop, out var binding))
             {
                 // TODO: implement this as a potentially queued item to be executed soon
-                binding.Refresh(this, prop); // this should then propagate it up if needed
+                binding.Refresh(this, prop, true); // this should then propagate it up if needed
             }
             if (invokeChanged)
                 prop.ValueChanged(this, value);

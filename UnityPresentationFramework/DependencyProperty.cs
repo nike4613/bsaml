@@ -177,12 +177,6 @@ namespace UnityPresentationFramework
         private readonly PropertyChanged<DependencyObject, T>? onChangedAtt = null;
         private readonly ValidateValue<DependencyObject, T>? validateAtt = null;
 
-        static DependencyProperty()
-        {
-            if (typeof(TOwner) == typeof(DependencyObject))
-                throw new InvalidOperationException("DependencyProperty's owner type cannot be DependencyObject");
-        }
-
         internal DependencyProperty(
             string name,
             T defaultValue,

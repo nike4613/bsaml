@@ -12,17 +12,6 @@ namespace UnityPresentationFramework
     {
         private readonly List<Element> children = new List<Element>();
 
-        public static readonly DependencyProperty<object?> DataContextProperty =
-            DependencyProperty.Register<Element, object?>(nameof(DataContext), null,
-                onChange: (e, v) => e.RequestBindingRefresh(),
-                metadata: new DependencyMetadata { InheritsFromParent = true });
-
-        public object? DataContext
-        {
-            get => GetValue(DataContextProperty);
-            set => SetValue(DataContextProperty, value);
-        }
-
         protected override sealed DependencyObject? ParentObject => Parent;
 
         public virtual Element? Parent { get; set; }
@@ -46,24 +35,24 @@ namespace UnityPresentationFramework
         internal void Finish()
         {
             Constructed = true;
-            RequestBindingRefresh(false);
+            RequestBindingRefresh(true);
             foreach (var child in this)
                 child.Finish();
         }
 
-        protected override sealed void RequestBindingRefresh()
-            => RequestBindingRefresh();
+        protected override sealed void RequestBindingRefresh(bool includeOut)
+            => RequestBindingRefresh(includeOut, true);
 
-        protected void RequestBindingRefresh(bool refreshChildren = true)
+        protected void RequestBindingRefresh(bool includeOut, bool refreshChildren = true)
         {
             if (!Constructed) return;
 
-            base.RequestBindingRefresh();
+            base.RequestBindingRefresh(includeOut);
 
             if (refreshChildren)
             {
                 foreach (var child in this)
-                    child.RequestBindingRefresh();
+                    child.RequestBindingRefresh(includeOut, refreshChildren);
             }
         }
         
