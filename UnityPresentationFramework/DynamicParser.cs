@@ -42,6 +42,8 @@ namespace UnityPresentationFramework
             if (result == null)
                 throw new InvalidOperationException("Root element was not an Element");
 
+            result.Finish();
+
             return result;
         }
     }

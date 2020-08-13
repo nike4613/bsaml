@@ -14,6 +14,7 @@ namespace UnityPresentationFramework
 
         public static readonly DependencyProperty<object?> DataContextProperty =
             DependencyProperty.Register<Element, object?>(nameof(DataContext), null,
+                onChange: (e, v) => e.RequestBindingRefresh(),
                 metadata: new DependencyMetadata { InheritsFromParent = true });
 
         public object? DataContext
@@ -39,6 +40,31 @@ namespace UnityPresentationFramework
                 throw new InvalidOperationException();
 
             Parent.ChildNeedsRedraw(this);
+        }
+
+        internal bool Constructed { get; private set; } = false;
+        internal void Finish()
+        {
+            Constructed = true;
+            RequestBindingRefresh(false);
+            foreach (var child in this)
+                child.Finish();
+        }
+
+        protected override sealed void RequestBindingRefresh()
+            => RequestBindingRefresh();
+
+        protected void RequestBindingRefresh(bool refreshChildren = true)
+        {
+            if (!Constructed) return;
+
+            base.RequestBindingRefresh();
+
+            if (refreshChildren)
+            {
+                foreach (var child in this)
+                    child.RequestBindingRefresh();
+            }
         }
         
         #region Implement ICollection<Element>

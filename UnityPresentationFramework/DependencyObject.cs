@@ -8,6 +8,11 @@ namespace UnityPresentationFramework
     {
         protected virtual DependencyObject? ParentObject => null;
 
+        protected virtual void RequestBindingRefresh()
+        {
+            // TODO:
+        }
+
         public object? GetValue(DependencyProperty prop)
         {
             if (!prop.IsValidTarget(this))
