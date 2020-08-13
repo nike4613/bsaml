@@ -35,7 +35,7 @@ namespace UnityPresentationFramework
 
         private static Element ReadFromReader(XamlReader xreader)
         {
-            var realReader = new UpfPostprocessingXamlReader(xreader);
+            var realReader = new UpfPostprocessingXamlReader(xreader, new SystemReflectionReflector());
             using var objWriter = new XamlObjectWriter(realReader.SchemaContext, new XamlObjectWriterSettings { });
 
             XamlServices.Transform(realReader, objWriter);

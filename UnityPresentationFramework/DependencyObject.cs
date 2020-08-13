@@ -48,17 +48,17 @@ namespace UnityPresentationFramework
             propertyValues.Clear();
         }
 
-        private readonly Dictionary<Binding, DependencyProperty> allBindings = new Dictionary<Binding, DependencyProperty>();
-        private readonly Dictionary<DependencyProperty, Binding> inBindings = new Dictionary<DependencyProperty, Binding>();
-        private readonly Dictionary<DependencyProperty, Binding> outBindings = new Dictionary<DependencyProperty, Binding>();
+        private readonly Dictionary<BindingExpression, DependencyProperty> allBindings = new Dictionary<BindingExpression, DependencyProperty>();
+        private readonly Dictionary<DependencyProperty, BindingExpression> inBindings = new Dictionary<DependencyProperty, BindingExpression>();
+        private readonly Dictionary<DependencyProperty, BindingExpression> outBindings = new Dictionary<DependencyProperty, BindingExpression>();
 
-        internal void RegisterBinding(Binding binding, DependencyProperty prop)
+        internal void RegisterBinding(BindingExpression binding, DependencyProperty prop)
         {
-            if ((binding.Direction & BindingDirection.OneWay) != 0)
+            if ((binding.Binding.Direction & BindingDirection.OneWay) != 0)
             {
                 inBindings.Add(prop, binding);
             }
-            if ((binding.Direction & BindingDirection.OneWayToSource) != 0)
+            if ((binding.Binding.Direction & BindingDirection.OneWayToSource) != 0)
             {
                 outBindings.Add(prop, binding);
             }

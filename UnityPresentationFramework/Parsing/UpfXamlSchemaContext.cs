@@ -10,7 +10,7 @@ namespace UnityPresentationFramework.Parsing
     internal class UpfXamlSchemaContext : XamlSchemaContext
     {
         private readonly XamlReader underlyingReader;
-        public UpfXamlSchemaContext(XamlReader under)
+        public UpfXamlSchemaContext(XamlReader under, IBindingReflector reflector)
             : base(under.SchemaContext.ReferenceAssemblies,
                   new XamlSchemaContextSettings
                   {
@@ -19,8 +19,11 @@ namespace UnityPresentationFramework.Parsing
                   })
         {
             underlyingReader = under;
+            Reflector = reflector;
         }
 
         public XamlSchemaContext UnderlyingContext => underlyingReader.SchemaContext;
+
+        public IBindingReflector Reflector { get; }
     }
 }

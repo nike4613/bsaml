@@ -8,6 +8,7 @@ using System.Windows.Markup;
 using System.Xaml;
 using System.Reflection;
 using System.Diagnostics;
+using UnityPresentationFramework.Parsing;
 
 namespace UnityPresentationFramework
 {
@@ -34,7 +35,9 @@ namespace UnityPresentationFramework
         public override object? ProvideValue(IServiceProvider serviceProvider)
         {
             var targets = serviceProvider.GetService<IProvideValueTarget>();
-            var schema = serviceProvider.GetService<IXamlSchemaContextProvider>().SchemaContext;
+            var schema = serviceProvider.GetService<IXamlSchemaContextProvider>().SchemaContext as UpfXamlSchemaContext;
+            if (schema == null)
+                throw new InvalidOperationException("Could not locate reflector");
 
             var targetObject = targets.TargetObject;
 
@@ -44,14 +47,9 @@ namespace UnityPresentationFramework
             if (!(targets.TargetProperty is DependencyProperty prop))
                 throw new InvalidOperationException("Cannot bind to a property that is not a DependencyProperty");
 
-            depObject.RegisterBinding(this, prop);
+            depObject.RegisterBinding(new BindingExpression(this, schema.Reflector), prop);
 
             return this;
-        }
-
-        internal void Refresh(DependencyObject obj, DependencyProperty toProp)
-        {
-
         }
 
         internal static void HandleBindingSet(object? sender, XamlSetMarkupExtensionEventArgs args)
