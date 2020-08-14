@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,22 +11,22 @@ namespace UnityPresentationFramework.Parsing
 {
     internal class UpfXamlReaderProvider : IXamlReaderProvider
     {
-        private readonly IBindingReflector Reflector;
-        public UpfXamlReaderProvider(IBindingReflector reflector)
+        private readonly IServiceProvider Services;
+        public UpfXamlReaderProvider(IServiceProvider services)
         {
-            Reflector = reflector;
+            Services = services;
         }
 
         public XamlReader FromStream(Stream stream)
         {
             var baseReader = new XamlXmlReader(stream);
-            return new UpfPostprocessingXamlReader(baseReader, Reflector);
+            return new UpfPostprocessingXamlReader(baseReader, Services);
         }
 
         public XamlReader FromTextReader(TextReader reader)
         {
             var baseReader = new XamlXmlReader(reader);
-            return new UpfPostprocessingXamlReader(baseReader, Reflector);
+            return new UpfPostprocessingXamlReader(baseReader, Services);
         }
 
         public XamlObjectWriterSettings SettingsWithRoot(object? root)

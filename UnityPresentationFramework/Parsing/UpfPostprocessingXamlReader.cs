@@ -13,10 +13,10 @@ namespace UnityPresentationFramework.Parsing
         private readonly XamlReader reader;
         private readonly XamlType dependencyObjectType;
 
-        public UpfPostprocessingXamlReader(XamlReader reader, IBindingReflector reflector)
+        public UpfPostprocessingXamlReader(XamlReader reader, IServiceProvider services)
         {
             this.reader = reader;
-            schemaContext = new UpfXamlSchemaContext(reader, reflector);
+            schemaContext = new UpfXamlSchemaContext(reader, services);
             dependencyObjectType = new XamlType(typeof(DependencyObject), schemaContext);
         }
 

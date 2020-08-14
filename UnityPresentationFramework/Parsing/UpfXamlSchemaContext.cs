@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,7 +11,7 @@ namespace UnityPresentationFramework.Parsing
     internal class UpfXamlSchemaContext : XamlSchemaContext
     {
         private readonly XamlReader underlyingReader;
-        public UpfXamlSchemaContext(XamlReader under, IBindingReflector reflector)
+        public UpfXamlSchemaContext(XamlReader under, IServiceProvider services)
             : base(under.SchemaContext.ReferenceAssemblies,
                   new XamlSchemaContextSettings
                   {
@@ -19,11 +20,14 @@ namespace UnityPresentationFramework.Parsing
                   })
         {
             underlyingReader = under;
-            Reflector = reflector;
+            Services = services;
+            Reflector = services.GetService<IBindingReflector>();
         }
 
         public XamlSchemaContext UnderlyingContext => underlyingReader.SchemaContext;
 
         public IBindingReflector Reflector { get; }
+
+        public IServiceProvider Services { get; }
     }
 }
