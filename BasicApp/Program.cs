@@ -14,11 +14,26 @@ namespace BasicApp
             dataCtx = obj.Skip(1).First().DataContext;
         }
 
+        public static DataObject GlobalDataContext { get; } = new DataObject();
+
+        public class DataObject
+        {
+            public string DoTheThing => "Hello!";
+            public string DataContextIsInherited => "The data context is inherited!";
+
+            public struct FirstThing_
+            {
+                public string Thing => "This is FirstThing.Thing";
+            }
+            public FirstThing_ FirstThing => new FirstThing_();
+        }
+
         const string Xaml = @"
 <ExampleElement xmlns=""upf""
                 xmlns:a=""clr-namespace:BasicApp;assembly=BasicApp""
-                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
-    <ExampleElement Text=""{Binding DoTheThing}"" DataContext=""17"">
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml""
+                DataContext=""{x:Static a:Program.GlobalDataContext}"">
+    <ExampleElement Text=""{Binding DoTheThing}"">
         <ExampleElement Text=""{Binding DataContextIsInherited}""/>
     </ExampleElement>
     <ExampleElement Text=""{Binding FirstThing.Thing}"" ExampleElement.ScrollTarget=""true""/>

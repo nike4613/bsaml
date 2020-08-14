@@ -14,7 +14,13 @@ namespace UnityPresentationFramework
 
         private void TextChanged(string v)
         {
+            foreach (var c in this)
+            {
+                if (c.GetValue(ScrollTargetProperty))
+                {
 
+                }
+            }
         }
 
         public string Text

@@ -86,16 +86,18 @@ namespace UnityPresentationFramework
         {
             ValueGetter? getter = null;
             ValueSetter? setter = null;
+            Type currentType = type;
 
             for (int i = 0; i < components.Length; i++) // this will always execute at least once
             {
-                var membGet = reflector.FindGetter(type, components[i]);
-                getter = getter == null ? membGet : ComposeGet(getter, membGet);
+                var membGet = reflector.FindGetter(currentType, components[i]);
                 if (i == components.Length - 1)
                 { // this is our last one
-                    var membSet = reflector.FindSetter(type, components[i]);
+                    var membSet = reflector.FindSetter(currentType, components[i]);
                     setter = getter == null ? membSet : ComposeSet(getter, membSet);
                 }
+                getter = getter == null ? membGet : ComposeGet(getter, membGet);
+                currentType = reflector.MemberType(currentType, components[i]);
             }
 
             return new CacheEntry
