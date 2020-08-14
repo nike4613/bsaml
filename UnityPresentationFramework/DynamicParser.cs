@@ -14,31 +14,40 @@ using UnityPresentationFramework.Parsing;
 
 namespace UnityPresentationFramework
 {
-    public static class DynamicParser
+    public class DynamicParser
     {
-        public static Element ParseXaml(string xaml)
+        private readonly IXamlReaderProvider ReaderProvider;
+        //private readonly IBindingReflector Reflector;
+
+        public DynamicParser(IXamlReaderProvider readerProvider/*, IBindingReflector reflector*/)
+        {
+            ReaderProvider = readerProvider;
+            //Reflector = reflector;
+        }
+
+        public Element ParseXaml(string xaml)
         {
             using var sreader = new StringReader(xaml);
             return ParseXaml(sreader);
         }
 
-        public static Element ParseXaml(TextReader xamlReader)
+        public Element ParseXaml(TextReader xamlReader)
         {
-            using var xreader = new XamlXmlReader(xamlReader);
+            using var xreader = ReaderProvider.FromTextReader(xamlReader);
             return ReadFromReader(xreader);
         }
-        public static Element ParseXaml(Stream xamlReader)
+        public Element ParseXaml(Stream xamlReader)
         {
-            using var xreader = new XamlXmlReader(xamlReader);
+            using var xreader = ReaderProvider.FromStream(xamlReader);
             return ReadFromReader(xreader);
         }
 
-        private static Element ReadFromReader(XamlReader xreader)
+        private Element ReadFromReader(XamlReader xreader)
         {
-            var realReader = new UpfPostprocessingXamlReader(xreader, new SystemReflectionReflector());
-            using var objWriter = new XamlObjectWriter(realReader.SchemaContext, new XamlObjectWriterSettings { });
+            //var realReader = new UpfPostprocessingXamlReader(xreader, Reflector);
+            using var objWriter = new XamlObjectWriter(xreader.SchemaContext, ReaderProvider.SettingsWithRoot(null));
 
-            XamlServices.Transform(realReader, objWriter);
+            XamlServices.Transform(xreader, objWriter);
 
             var result = objWriter.Result as Element;
             if (result == null)

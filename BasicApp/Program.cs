@@ -9,7 +9,7 @@ namespace BasicApp
     {
         static void Main(string[] args)
         {
-            var obj = DynamicParser.ParseXaml(Xaml);
+            var obj = UPF.Parser.ParseXaml(Xaml);
 
             var dataCtx = obj.First().First().DataContext;
             dataCtx = obj.Skip(1).First().DataContext;

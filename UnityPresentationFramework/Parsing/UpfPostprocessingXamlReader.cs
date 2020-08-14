@@ -84,5 +84,14 @@ namespace UnityPresentationFramework.Parsing
 
             return member;
         }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            if (reader is IDisposable disp)
+            {
+                disp.Dispose();
+            }
+        }
     }
 }
