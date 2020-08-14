@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -30,6 +32,7 @@ namespace UnityPresentationFramework
             public Type RootType;
             public ValueGetter Getter;
             public ValueSetter Setter;
+            public ValueGetter[] Stages;
         }
         
         public object? GetValue(object target)
@@ -42,6 +45,105 @@ namespace UnityPresentationFramework
         {
             var entry = ForTargetObject(target);
             entry.Setter(target, value);
+        }
+
+        // TODO: maybe just store a list of objects that we've bound a handler to so we can always unsub from all of them?
+        private readonly ConditionalWeakTable<Action<object?>, ConditionalWeakTable<object, PropertyChangedEventHandler>> handlerDelegates
+            = new ConditionalWeakTable<Action<object?>, ConditionalWeakTable<object, PropertyChangedEventHandler>>();
+
+        public bool AddChangedHandler(object target, Action<object?> handler)
+        {
+            var entry = ForTargetObject(target);
+            var handlerMap = handlerDelegates.GetOrCreateValue(handler);
+
+            bool result = false;
+            object? obj = target;
+            for (int i = 0; i < components.Length; i++)
+            {
+                result = TryAddLayerChangedHandler(entry, handlerMap, i, obj, handler) || result;
+                obj = Propagate(obj, entry.Stages[i]);
+                if (obj == null)
+                    break;
+            }
+
+            return result;
+        }
+
+        private bool TryAddLayerChangedHandler(
+            in CacheEntry entry, 
+            ConditionalWeakTable<object, PropertyChangedEventHandler> handlerMap, 
+            int layer, 
+            object obj, 
+            Action<object?> handler
+        )
+        {
+            if (obj is INotifyPropertyChanged notify)
+            {
+                var propName = components[layer];
+
+                if (handlerMap.TryGetValue(obj, out _))
+                {
+                    // TODO: warn
+                    return true;
+                }
+
+                var stages = entry.Stages;
+                var propHandler = new PropertyChangedEventHandler((sender, args) =>
+                {
+                    if (args.PropertyName == propName)
+                    {
+                        var obj = sender;
+                        for (int i = layer + 1; i < components.Length; i++)
+                        {
+                            obj = Propagate(obj, stages[i]);
+                        }
+                        handler(obj);
+                    }
+                });
+                handlerMap.Add(obj, propHandler);
+                notify.PropertyChanged += propHandler;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public void RemoveChangedHandler(object target, Action<object?> handler)
+        {
+            var entry = ForTargetObject(target);
+            var handlerMap = handlerDelegates.GetOrCreateValue(handler);
+
+            object? obj = target;
+            for (int i = 0; i < components.Length - 1; i++)
+            {
+                TryRemoveLayerChangedHandler(handlerMap, i, obj);
+                obj = Propagate(obj, entry.Stages[i]);
+                if (obj == null)
+                    break;
+            }
+        }
+
+        private bool TryRemoveLayerChangedHandler(
+            ConditionalWeakTable<object, PropertyChangedEventHandler> handlerMap,
+            int layer,
+            object obj
+        )
+        {
+            if (obj is INotifyPropertyChanged notify)
+            {
+                var propName = components[layer];
+
+                if (!handlerMap.TryGetValue(obj, out var handler))
+                    return false;
+
+                handlerMap.Remove(obj);
+                notify.PropertyChanged += handler;
+
+                return true;
+            }
+
+            return false;
         }
 
         private CacheEntry ForTargetObject(object target)
@@ -88,6 +190,8 @@ namespace UnityPresentationFramework
             ValueSetter? setter = null;
             Type currentType = type;
 
+            var stages = new ValueGetter[components.Length];
+
             for (int i = 0; i < components.Length; i++) // this will always execute at least once
             {
                 var membGet = reflector.FindGetter(currentType, components[i]);
@@ -98,31 +202,34 @@ namespace UnityPresentationFramework
                 }
                 getter = getter == null ? membGet : ComposeGet(getter, membGet);
                 currentType = reflector.MemberType(currentType, components[i]);
+
+                stages[i] = membGet;
             }
 
             return new CacheEntry
             { // i know that both will be set here
                 RootType = type,
                 Getter = getter!,
-                Setter = setter!
+                Setter = setter!,
+                Stages = stages,
             };
         }
 
+        private static object? Propagate(object? parent, ValueGetter getter)
+        {
+            if (parent == null)
+                throw new NullReferenceException();
+            return getter(parent);
+        }
+        private static void Propagate(object? parent, ValueSetter setter, object? value)
+        {
+            if (parent == null)
+                throw new NullReferenceException();
+            setter(parent, value);
+        }
         private static ValueGetter ComposeGet(ValueGetter parent, ValueGetter member)
-            => self =>
-            {
-                var parentObj = parent(self);
-                if (parentObj == null)
-                    throw new NullReferenceException();
-                return member(parentObj);
-            };
+            => self => Propagate(parent(self), member);
         private static ValueSetter ComposeSet(ValueGetter parent, ValueSetter member)
-            => (self, value) =>
-            {
-                var parentObj = parent(self);
-                if (parentObj == null)
-                    throw new NullReferenceException();
-                member(parentObj, value);
-            };
+            => (self, value) => Propagate(parent(self), member, value);
     }
 }

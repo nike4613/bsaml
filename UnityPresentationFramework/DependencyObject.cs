@@ -63,6 +63,8 @@ namespace UnityPresentationFramework
         private readonly Dictionary<DependencyProperty, BindingExpression> inBindings = new Dictionary<DependencyProperty, BindingExpression>();
         private readonly Dictionary<DependencyProperty, BindingExpression> outBindings = new Dictionary<DependencyProperty, BindingExpression>();
 
+        internal event Action<DependencyObject, DependencyProperty>? DependencyPropertyChanged;
+
         internal void RegisterBinding(BindingExpression binding, DependencyProperty prop)
         {
             if ((binding.Binding.Direction & BindingDirection.OneWay) != 0)
@@ -79,6 +81,7 @@ namespace UnityPresentationFramework
         protected virtual void RequestBindingRefresh(bool includeOut)
         {
             // TODO: make this queue to some dispatcher
+            // TODO: need to figure out how to manage dependencies between bindings
             foreach (var kvp in inBindings)
             {
                 kvp.Value.Refresh(this, kvp.Key, false);
@@ -133,6 +136,7 @@ namespace UnityPresentationFramework
                 // TODO: implement this as a potentially queued item to be executed soon
                 binding.Refresh(this, prop, true); // this should then propagate it up if needed
             }
+            DependencyPropertyChanged?.Invoke(this, prop);
             if (invokeChanged)
                 prop.ValueChanged(this, value);
         }

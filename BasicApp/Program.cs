@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using UnityPresentationFramework;
 
@@ -16,16 +17,20 @@ namespace BasicApp
 
         public static DataObject GlobalDataContext { get; } = new DataObject();
 
-        public class DataObject
+        public class DataObject : INotifyPropertyChanged
         {
             public string DoTheThing => "Hello!";
             public string DataContextIsInherited => "The data context is inherited!";
 
-            public struct FirstThing_
+            public struct FirstThing_ : INotifyPropertyChanged
             {
                 public string Thing => "This is FirstThing.Thing";
+
+                public event PropertyChangedEventHandler PropertyChanged;
             }
             public FirstThing_ FirstThing => new FirstThing_();
+
+            public event PropertyChangedEventHandler PropertyChanged;
         }
 
         const string Xaml = @"
@@ -37,7 +42,7 @@ namespace BasicApp
         <ExampleElement Text=""{Binding DataContextIsInherited}""/>
     </ExampleElement>
     <ExampleElement Text=""{Binding FirstThing.Thing}"" ExampleElement.ScrollTarget=""true""/>
-    <ExampleElement Text=""{Binding Thing}"" DataContext=""{Binding FirstThing}""/>
+    <ExampleElement DataContext=""{Binding FirstThing}"" Text=""{Binding Thing}"" />
 </ExampleElement>
 ";
     }
