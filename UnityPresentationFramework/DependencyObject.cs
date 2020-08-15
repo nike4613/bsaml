@@ -80,18 +80,17 @@ namespace UnityPresentationFramework
 
         protected virtual void RequestBindingRefresh(bool includeOut)
         {
-            // TODO: make this queue to some dispatcher
             // TODO: need to figure out how to manage dependencies between bindings
             foreach (var kvp in inBindings)
             {
-                kvp.Value.Refresh(this, kvp.Key, false);
+                kvp.Value.QueueRefresh(this, kvp.Key, false);
             }
 
             if (includeOut)
             {
                 foreach (var kvp in outBindings)
                 {
-                    kvp.Value.Refresh(this, kvp.Key, true);
+                    kvp.Value.QueueRefresh(this, kvp.Key, true);
                 }
             }    
         }
@@ -133,8 +132,7 @@ namespace UnityPresentationFramework
             propertyValues[prop] = value;
             if (outBindings.TryGetValue(prop, out var binding))
             {
-                // TODO: implement this as a potentially queued item to be executed soon
-                binding.Refresh(this, prop, true); // this should then propagate it up if needed
+                binding.QueueRefresh(this, prop, true); // this should then propagate it up if needed
             }
             DependencyPropertyChanged?.Invoke(this, prop);
             if (invokeChanged)

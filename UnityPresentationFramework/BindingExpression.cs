@@ -12,6 +12,7 @@ namespace UnityPresentationFramework
         public Binding Binding { get; }
 
         public IBindingReflector Reflector { get; }
+        public IDispatcher Dispatcher { get; }
         public IServiceProvider Services { get; }
 
         public PropertyPath Path { get; }
@@ -21,14 +22,16 @@ namespace UnityPresentationFramework
             Binding = binding;
             Services = services;
             Reflector = services.GetRequiredService<IBindingReflector>();
+            Dispatcher = services.GetRequiredService<IDispatcher>();
             Path = new PropertyPath(binding.Path.Split('.'), services);
         }
+
 
         private DependencyObject? lastObj;
         private DependencyProperty? lastProp;
         private object? lastContext;
 
-        internal void Refresh(DependencyObject obj, DependencyProperty toProp, bool targetPropChanged)
+        private void Refresh(DependencyObject obj, DependencyProperty toProp, bool targetPropChanged)
         {
             if ((lastObj != null && lastObj != obj)
              || (lastProp != null && lastProp != toProp))
@@ -62,9 +65,15 @@ namespace UnityPresentationFramework
             lastContext = context;
         }
 
+        internal void QueueRefresh(DependencyObject obj, DependencyProperty toProp, bool targetPropChanged)
+        {
+            Dispatcher.BeginInvoke(() => Refresh(obj, toProp, targetPropChanged));
+        }
+
         private void OnValueChanged(object? value)
         {
             // TODO: somehow queue a refresh
+            QueueRefresh(lastObj!, lastProp!, false);
         }
     }
 }

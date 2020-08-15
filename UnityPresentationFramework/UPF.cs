@@ -17,6 +17,7 @@ namespace UnityPresentationFramework
             var collection = new ServiceCollection()
                 .AddSingleton<IBindingReflector, SystemReflectionReflector>()
                 .AddSingleton<IXamlReaderProvider, UpfXamlReaderProvider>()
+                .AddSingleton<IDispatcher, ThreadDispatcher>()
                 .AddSingleton<ILogger>(s => new LoggerConfiguration()
                     .MinimumLevel.Debug()
                     .Enrich.WithExceptionDetails()
@@ -27,6 +28,11 @@ namespace UnityPresentationFramework
                 .AddSingleton<DynamicParser>();
 
             return collection.BuildServiceProvider();
+        }
+
+        public static void Close()
+        {
+            using var disp = Services.GetService<IDispatcher>() as IDisposable;
         }
 
         internal static IServiceProvider Services { get; } = CreateServices();

@@ -13,6 +13,8 @@ namespace BasicApp
 
             var dataCtx = obj.First().First().DataContext;
             dataCtx = obj.Skip(1).First().DataContext;
+
+            UPF.Close();
         }
 
         public static DataObject GlobalDataContext { get; } = new DataObject();
