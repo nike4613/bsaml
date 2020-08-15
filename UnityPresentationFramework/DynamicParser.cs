@@ -19,12 +19,14 @@ namespace UnityPresentationFramework
     public class DynamicParser
     {
         private readonly IXamlReaderProvider ReaderProvider;
+        private readonly ILogger Logger;
         private readonly IServiceProvider Services;
 
-        public DynamicParser(IXamlReaderProvider readerProvider, IServiceProvider services)
+        public DynamicParser(IXamlReaderProvider readerProvider, ILogger logger, IServiceProvider services)
         {
             ReaderProvider = readerProvider;
             Services = services;
+            Logger = logger;
         }
 
         public Element ParseXaml(string xaml)
@@ -49,15 +51,31 @@ namespace UnityPresentationFramework
             //var realReader = new UpfPostprocessingXamlReader(xreader, Reflector);
             using var objWriter = new XamlObjectWriter(xreader.SchemaContext, ReaderProvider.SettingsWithRoot(null));
 
-            XamlServices.Transform(xreader, objWriter);
+            try
+            {
+                XamlServices.Transform(xreader, objWriter);
 
-            var result = objWriter.Result as Element;
-            if (result == null)
-                throw new InvalidOperationException("Root element was not an Element");
+                var result = objWriter.Result as Element;
+                if (result == null)
+                    throw new InvalidOperationException("Root element was not an Element");
 
-            result.Attach();
+                result.Attach();
 
-            return result;
+                return result;
+            }
+            catch (Exception e)
+            {
+                Logger.Fatal(e, "An error ocurred while parsing and constructing XAML");
+
+                throw new XamlParseException(e);
+            }
+        }
+    }
+
+    public class XamlParseException : Exception
+    {
+        public XamlParseException(Exception e) : base("Error while parsing and constructing XAML structure", e)
+        {
         }
     }
 }
