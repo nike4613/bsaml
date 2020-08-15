@@ -132,7 +132,7 @@ namespace UnityPresentationFramework
                     exception = ExceptionDispatchInfo.Capture(e);
                     if (continuations.Count == 0)
                     {
-                        logger.Error(e, "Exception in orphaned DispatcherOperation");
+                        logger.Error(exception.SourceException, "Exception in orphaned DispatcherOperation");
                     }
                 }
                 finally

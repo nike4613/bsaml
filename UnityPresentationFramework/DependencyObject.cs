@@ -10,8 +10,8 @@ namespace UnityPresentationFramework
 
         public static readonly DependencyProperty<object?> DataContextProperty =
             DependencyProperty.Register<DependencyObject, object?>(nameof(DataContext), null,
-                onChange: (e, v) => e.RequestBindingRefresh(true),
-                metadata: new DependencyMetadata { InheritsFromParent = true });
+                onChange: (e, v) => e.RequestRefreshes(true, true),
+                metadata: new DependencyMetadata { InheritsFromParent = true, ExcludedFromDataContextRefresh = true });
 
         public object? DataContext
         {
@@ -79,20 +79,25 @@ namespace UnityPresentationFramework
         }
 
         protected virtual void RequestBindingRefresh(bool includeOut)
+            => RequestRefreshes(includeOut, false);
+
+        private void RequestRefreshes(bool includeOut, bool isDataContextRefresh)
         {
             // TODO: need to figure out how to manage dependencies between bindings
             foreach (var kvp in inBindings)
             {
-                kvp.Value.QueueRefresh(this, kvp.Key, false);
+                if (!kvp.Key.Metadata.ExcludedFromDataContextRefresh || !isDataContextRefresh)
+                    kvp.Value.QueueRefresh(this, kvp.Key, false);
             }
 
             if (includeOut)
             {
                 foreach (var kvp in outBindings)
                 {
-                    kvp.Value.QueueRefresh(this, kvp.Key, true);
+                    if (!kvp.Key.Metadata.ExcludedFromDataContextRefresh || !isDataContextRefresh)
+                        kvp.Value.QueueRefresh(this, kvp.Key, true);
                 }
-            }    
+            }
         }
 
         private readonly Dictionary<DependencyProperty, object?> propertyValues = new Dictionary<DependencyProperty, object?>();

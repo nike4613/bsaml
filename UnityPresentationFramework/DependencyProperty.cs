@@ -18,6 +18,7 @@ namespace UnityPresentationFramework
         {
             None = 0,
             InheritsParent = 0x01,
+            ExcludeFromDataContextRefresh = 0x02,
 
             _All = 0xFF,
         }
@@ -27,6 +28,11 @@ namespace UnityPresentationFramework
         {
             get => 0 != (flags & Flags.InheritsParent);
             set => flags = (flags & ~Flags.InheritsParent) | (value ? Flags.InheritsParent : 0);
+        }
+        public bool ExcludedFromDataContextRefresh
+        {
+            get => 0 != (flags & Flags.ExcludeFromDataContextRefresh);
+            set => flags = (flags & ~Flags.ExcludeFromDataContextRefresh) | (value ? Flags.ExcludeFromDataContextRefresh : 0);
         }
     }
 
@@ -113,7 +119,7 @@ namespace UnityPresentationFramework
 
         public bool IsInherited => Metadata.InheritsFromParent;
 
-        protected DependencyMetadata Metadata { get; }
+        protected internal DependencyMetadata Metadata { get; }
 
         protected DependencyProperty(string name, bool isAttached, object? defaultValue, DependencyMetadata metadata)
         {
