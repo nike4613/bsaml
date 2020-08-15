@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,14 +12,16 @@ namespace UnityPresentationFramework
         public Binding Binding { get; }
 
         public IBindingReflector Reflector { get; }
+        public IServiceProvider Services { get; }
 
         public PropertyPath Path { get; }
 
-        public BindingExpression(Binding binding, IBindingReflector reflector)
+        public BindingExpression(Binding binding, IServiceProvider services)
         {
             Binding = binding;
-            Reflector = reflector;
-            Path = new PropertyPath(binding.Path.Split('.'), reflector);
+            Services = services;
+            Reflector = services.GetRequiredService<IBindingReflector>();
+            Path = new PropertyPath(binding.Path.Split('.'), services);
         }
 
         private DependencyObject? lastObj;

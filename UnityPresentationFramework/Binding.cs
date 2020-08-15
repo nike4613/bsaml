@@ -49,7 +49,7 @@ namespace UnityPresentationFramework
             if (!(targets.TargetProperty is DependencyProperty prop))
                 throw new InvalidOperationException("Cannot bind to a property that is not a DependencyProperty");
 
-            depObject.RegisterBinding(new BindingExpression(this, schema.Reflector), prop);
+            depObject.RegisterBinding(new BindingExpression(this, schema.Services), prop);
 
             return this;
         }

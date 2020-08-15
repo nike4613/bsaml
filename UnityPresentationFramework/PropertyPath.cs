@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Serilog;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -9,19 +11,23 @@ using System.Threading.Tasks;
 
 namespace UnityPresentationFramework
 {
-    [DebuggerDisplay("{System.String.Join('.', components)}")]
+    [DebuggerDisplay("{System.String.Join(\".\", components)}")]
     public class PropertyPath
     {
         private readonly string[] components;
         private readonly IBindingReflector reflector;
+        private readonly ILogger logger;
 
-        public PropertyPath(IEnumerable<string> components, IBindingReflector reflector)
+        public PropertyPath(IEnumerable<string> components, IServiceProvider services)
         {
             this.components = components.ToArray();
             if (this.components.Length < 1)
                 throw new ArgumentException("PropertyPath must have at least one component", nameof(components));
-            this.reflector = reflector;
+            reflector = services.GetRequiredService<IBindingReflector>();
+            logger = services.GetRequiredService<ILogger>();
         }
+
+        public IEnumerable<string> Components => components;
 
         private const int maxCacheSize = 4;
         private readonly Queue<CacheEntry> typeCache = new Queue<CacheEntry>(maxCacheSize + 1);
@@ -83,7 +89,7 @@ namespace UnityPresentationFramework
 
                 if (handlerMap.TryGetValue(obj, out _))
                 {
-                    // TODO: warn
+                    logger.Warning("Trying to re-register the same changed handler to an object ({PathComponent} in {Path})", propName, this);
                     return true;
                 }
 

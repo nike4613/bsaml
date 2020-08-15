@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -21,7 +22,7 @@ namespace UnityPresentationFramework
             if (Parent != null)
                 RequestRedraw();
 
-            // TODO: warn here
+            UPF.Logger.Warning("During child redraw request on {Element} for {Child}: Could not queue redraw becase there is no parent!", this, child);
         }
         protected virtual void RequestRedraw()
         {
@@ -32,12 +33,12 @@ namespace UnityPresentationFramework
         }
 
         internal bool Constructed { get; private set; } = false;
-        internal void Finish()
+        internal void Attach()
         {
             Constructed = true;
-            RequestBindingRefresh(true);
+            RequestBindingRefresh(true, false);
             foreach (var child in this)
-                child.Finish();
+                child.Attach();
         }
 
         protected override sealed void RequestBindingRefresh(bool includeOut)

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Serilog;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,12 +19,12 @@ namespace UnityPresentationFramework
     public class DynamicParser
     {
         private readonly IXamlReaderProvider ReaderProvider;
-        //private readonly IBindingReflector Reflector;
+        private readonly IServiceProvider Services;
 
-        public DynamicParser(IXamlReaderProvider readerProvider/*, IBindingReflector reflector*/)
+        public DynamicParser(IXamlReaderProvider readerProvider, IServiceProvider services)
         {
             ReaderProvider = readerProvider;
-            //Reflector = reflector;
+            Services = services;
         }
 
         public Element ParseXaml(string xaml)
@@ -53,7 +55,7 @@ namespace UnityPresentationFramework
             if (result == null)
                 throw new InvalidOperationException("Root element was not an Element");
 
-            result.Finish();
+            result.Attach();
 
             return result;
         }

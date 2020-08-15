@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Serilog;
+using Serilog.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,18 +12,25 @@ namespace UnityPresentationFramework
 {
     public static class UPF
     {
-        private static readonly IServiceProvider services = CreateServices();
-
         private static IServiceProvider CreateServices()
         {
             var collection = new ServiceCollection()
                 .AddSingleton<IBindingReflector, SystemReflectionReflector>()
                 .AddSingleton<IXamlReaderProvider, UpfXamlReaderProvider>()
+                .AddSingleton<ILogger>(s => new LoggerConfiguration()
+                    .MinimumLevel.Debug()
+                    .Enrich.WithExceptionDetails()
+                    .Enrich.WithDemystifiedStackTraces()
+                    .Destructure.ByTransforming<PropertyPath>(p => new { p.Components })
+                    .WriteTo.Console()
+                    .CreateLogger())
                 .AddSingleton<DynamicParser>();
 
             return collection.BuildServiceProvider();
         }
 
-        public static DynamicParser Parser => services.GetRequiredService<DynamicParser>();
+        internal static IServiceProvider Services { get; } = CreateServices();
+        internal static ILogger Logger => Services.GetRequiredService<ILogger>();
+        public static DynamicParser Parser => Services.GetRequiredService<DynamicParser>();
     }
 }
