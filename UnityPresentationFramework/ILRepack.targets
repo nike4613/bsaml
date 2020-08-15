@@ -5,6 +5,16 @@
     <ItemGroup>
       <InputAssemblies Include="$(OutputPath)$(TargetName)$(TargetExt)"/>
       <InputAssemblies Include="$(OutputPath)*.dll" Exclude="$(OutputPath)$(TargetName)$(TargetExt)"/>
+
+      <InputAssemblies Remove="**\System.Data.*" />
+      <InputAssemblies Remove="**\System.Diagnostics.*" />
+      <InputAssemblies Remove="**\System.Drawing.*" />
+      <InputAssemblies Remove="**\System.Globalization.*" />
+      <InputAssemblies Remove="**\System.IO.Compression.*" />
+      <InputAssemblies Remove="**\System.Net.*" />
+      <InputAssemblies Remove="**\System.Runtime.*" />
+      <InputAssemblies Remove="**\System.Security.*" />
+      <InputAssemblies Remove="**\System.Threading.Overlapped.*" />
     </ItemGroup>
 
     <ILRepack
