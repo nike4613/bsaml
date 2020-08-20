@@ -7,10 +7,10 @@ using System.Xaml.Schema;
 
 namespace Knit.Parsing
 {
-    internal class UpfDependencyPropMemberInvoker : XamlMemberInvoker
+    internal class KnitDependencyPropMemberInvoker : XamlMemberInvoker
     {
         private readonly DependencyProperty prop;
-        internal UpfDependencyPropMemberInvoker(DependencyProperty prop)
+        internal KnitDependencyPropMemberInvoker(DependencyProperty prop)
         {
             this.prop = prop;
         }

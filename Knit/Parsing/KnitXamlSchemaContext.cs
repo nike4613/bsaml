@@ -8,10 +8,10 @@ using System.Xaml;
 
 namespace Knit.Parsing
 {
-    internal class UpfXamlSchemaContext : XamlSchemaContext
+    internal class KnitXamlSchemaContext : XamlSchemaContext
     {
         private readonly XamlReader underlyingReader;
-        public UpfXamlSchemaContext(XamlReader under, IServiceProvider services)
+        public KnitXamlSchemaContext(XamlReader under, IServiceProvider services)
             : base(under.SchemaContext.ReferenceAssemblies,
                   new XamlSchemaContextSettings
                   {

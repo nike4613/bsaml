@@ -9,10 +9,10 @@ using System.Xaml;
 
 namespace Knit.Parsing
 {
-    internal class UpfXamlReaderProvider : IXamlReaderProvider
+    internal class KnitXamlReaderProvider : IXamlReaderProvider
     {
         private readonly IServiceProvider Services;
-        public UpfXamlReaderProvider(IServiceProvider services)
+        public KnitXamlReaderProvider(IServiceProvider services)
         {
             Services = services;
         }
@@ -20,13 +20,13 @@ namespace Knit.Parsing
         public XamlReader FromStream(Stream stream)
         {
             var baseReader = new XamlXmlReader(stream);
-            return new UpfPostprocessingXamlReader(baseReader, Services);
+            return new KnitPostprocessingXamlReader(baseReader, Services);
         }
 
         public XamlReader FromTextReader(TextReader reader)
         {
             var baseReader = new XamlXmlReader(reader);
-            return new UpfPostprocessingXamlReader(baseReader, Services);
+            return new KnitPostprocessingXamlReader(baseReader, Services);
         }
 
         public XamlObjectWriterSettings SettingsWithRoot(object? root)

@@ -8,15 +8,15 @@ using System.Xaml;
 
 namespace Knit.Parsing
 {
-    internal class UpfPostprocessingXamlReader : XamlReader
+    internal class KnitPostprocessingXamlReader : XamlReader
     {
         private readonly XamlReader reader;
         private readonly XamlType dependencyObjectType;
 
-        public UpfPostprocessingXamlReader(XamlReader reader, IServiceProvider services)
+        public KnitPostprocessingXamlReader(XamlReader reader, IServiceProvider services)
         {
             this.reader = reader;
-            schemaContext = new UpfXamlSchemaContext(reader, services);
+            schemaContext = new KnitXamlSchemaContext(reader, services);
             dependencyObjectType = new XamlType(typeof(DependencyObject), schemaContext);
         }
 
@@ -38,7 +38,7 @@ namespace Knit.Parsing
         private XamlMember? member = null;
         public override XamlMember? Member => member;
 
-        private readonly UpfXamlSchemaContext schemaContext;
+        private readonly KnitXamlSchemaContext schemaContext;
         public override XamlSchemaContext SchemaContext => schemaContext;
 
         public override bool Read()
@@ -62,7 +62,7 @@ namespace Knit.Parsing
         }
 
         private readonly Dictionary<Type, XamlType> ownerTypeCache = new Dictionary<Type, XamlType>();
-        private readonly ConditionalWeakTable<DependencyProperty, UpfXamlPropertyMember> propCache = new ConditionalWeakTable<DependencyProperty, UpfXamlPropertyMember>();
+        private readonly ConditionalWeakTable<DependencyProperty, KnitXamlPropertyMember> propCache = new ConditionalWeakTable<DependencyProperty, KnitXamlPropertyMember>();
 
         private XamlMember TransformMember(XamlMember member)
         {
@@ -77,7 +77,7 @@ namespace Knit.Parsing
                 {
                     if (!ownerTypeCache.TryGetValue(depProp.OwningType, out var xamlType))
                         ownerTypeCache.Add(depProp.OwningType, xamlType = new XamlType(depProp.OwningType, schemaContext));
-                    propCache.Add(depProp, uMember = new UpfXamlPropertyMember(depProp, xamlType, dependencyObjectType));
+                    propCache.Add(depProp, uMember = new KnitXamlPropertyMember(depProp, xamlType, dependencyObjectType));
                 }
                 return uMember;
             }

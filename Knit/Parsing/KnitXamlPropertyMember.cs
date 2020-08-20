@@ -10,20 +10,20 @@ using System.Xaml.Schema;
 
 namespace Knit.Parsing
 {
-    internal class UpfXamlPropertyMember : XamlMember, IProvideValueTarget
+    internal class KnitXamlPropertyMember : XamlMember, IProvideValueTarget
     {
         private readonly DependencyProperty prop;
         private readonly XamlType owner;
         private readonly XamlType depObjType;
-        private readonly UpfDependencyPropMemberInvoker invoker;
+        private readonly KnitDependencyPropMemberInvoker invoker;
 
-        public UpfXamlPropertyMember(DependencyProperty prop, XamlType owner, XamlType depObjType) 
+        public KnitXamlPropertyMember(DependencyProperty prop, XamlType owner, XamlType depObjType) 
             : base(prop.Name, owner, prop.IsAttached)
         {
             this.prop = prop;
             this.owner = owner;
             this.depObjType = depObjType;
-            invoker = new UpfDependencyPropMemberInvoker(prop);
+            invoker = new KnitDependencyPropMemberInvoker(prop);
         }
 
         protected override XamlMemberInvoker LookupInvoker() => invoker;

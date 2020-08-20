@@ -10,6 +10,8 @@ using System.Reflection;
 using System.Diagnostics;
 using Knit.Parsing;
 
+[assembly: XmlnsDefinition("knit", nameof(Knit))]
+
 namespace Knit
 {
     public enum BindingDirection
@@ -37,7 +39,7 @@ namespace Knit
         public override object? ProvideValue(IServiceProvider serviceProvider)
         {
             var targets = serviceProvider.GetService<IProvideValueTarget>();
-            var schema = serviceProvider.GetService<IXamlSchemaContextProvider>().SchemaContext as UpfXamlSchemaContext;
+            var schema = serviceProvider.GetService<IXamlSchemaContextProvider>().SchemaContext as KnitXamlSchemaContext;
             if (schema == null)
                 throw new InvalidOperationException("Could not locate reflector");
 

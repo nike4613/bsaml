@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net471</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Knit\Knit.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.18.1" />
+    <PackageReference Include="Serilog.Enrichers.Demystify" Version="1.0.0-dev-00019" />
+    <PackageReference Include="Serilog.Exceptions" Version="5.6.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Xaml" />
+  </ItemGroup>
+  
+</Project>

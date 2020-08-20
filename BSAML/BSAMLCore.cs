@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Knit;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Exceptions;
 using System;
@@ -6,28 +7,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Knit.Parsing;
 
-namespace Knit
+namespace BSAML
 {
-    public static class UPF
+    public static class BSAMLCore
     {
         private static IServiceProvider CreateServices()
         {
             var collection = new ServiceCollection()
-                .AddSingleton<IBindingReflector, SystemReflectionReflector>()
-                .AddSingleton<IXamlReaderProvider, UpfXamlReaderProvider>()
+                .AddKnitServices(withDefaultReflector: true)
                 .AddSingleton<IDispatcher, ThreadDispatcher>()
                 .AddSingleton<ILogger>(s => new LoggerConfiguration()
                     .MinimumLevel.Debug()
                     .Enrich.WithExceptionDetails()
                     .Enrich.WithDemystifiedStackTraces()
-                    .Destructure.ByTransforming<PropertyPath>(p => new { p.Components })
+                    .Destructure.KnitTypes()
                     .WriteTo.Console()
                     .CreateLogger())
                 .AddSingleton<DynamicParser>();
-
-            return collection.BuildServiceProvider();
+            var provider = collection.BuildServiceProvider();
+            if (!KnitServices.ValidateServices(provider))
+                throw new InvalidOperationException("Knit services not prepared correctly");
+            return provider;
         }
 
         public static void Close()
@@ -37,6 +38,8 @@ namespace Knit
 
         internal static IServiceProvider Services { get; } = CreateServices();
         internal static ILogger Logger => Services.GetRequiredService<ILogger>();
+        internal static IDispatcher Dispatcher => Services.GetRequiredService<IDispatcher>();
+
         public static DynamicParser Parser => Services.GetRequiredService<DynamicParser>();
     }
 }

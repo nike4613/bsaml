@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Knit\Knit.csproj" />
+    <ProjectReference Include="..\BSAML\BSAML.csproj" />
   </ItemGroup>
 
 </Project>

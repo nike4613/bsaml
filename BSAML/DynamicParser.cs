@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 using System.Windows.Markup;
 using System.Xaml;
 using System.Xml;
-using Knit.Parsing;
+using Knit;
 
-[assembly: XmlnsDefinition("upf", nameof(Knit))]
+[assembly: XmlnsDefinition("bsaml", nameof(BSAML))]
 
-namespace Knit
+namespace BSAML
 {
     public class DynamicParser
     {

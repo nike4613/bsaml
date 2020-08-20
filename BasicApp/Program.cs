@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
-using Knit;
+using BSAML;
 
 namespace BasicApp
 {
@@ -9,12 +9,12 @@ namespace BasicApp
     {
         static void Main(string[] args)
         {
-            var obj = Knit.UPF.Parser.ParseXaml(Xaml);
+            var obj = BSAMLCore.Parser.ParseXaml(Xaml);
 
             var dataCtx = obj.First().First().DataContext;
             dataCtx = obj.Skip(1).First().DataContext;
 
-            Knit.UPF.Close();
+            BSAMLCore.Close();
         }
 
         public static DataObject GlobalDataContext { get; } = new DataObject();

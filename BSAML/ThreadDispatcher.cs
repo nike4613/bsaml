@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using Knit;
+using Serilog;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Knit
+namespace BSAML
 {
     internal sealed class ThreadDispatcher : IDispatcher, IDisposable
     {
@@ -20,8 +21,10 @@ namespace Knit
         public ThreadDispatcher(ILogger logger)
         {
             Logger = logger;
-            thread = new Thread(() => ExecutionThread());
-            thread.IsBackground = true;
+            thread = new Thread(() => ExecutionThread())
+            {
+                IsBackground = true
+            };
             thread.Start();
         }
 

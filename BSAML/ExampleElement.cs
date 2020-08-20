@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Knit;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Knit
+namespace BSAML
 {
     public class ExampleElement : Element<ExampleElement>
     {

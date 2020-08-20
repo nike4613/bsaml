@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using Knit;
+using Serilog;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Text;
 
 using GameObject = System.Object;
 
-namespace Knit
+namespace BSAML
 {
     public abstract class Element : DependencyObject, ICollection<Element>
     {
@@ -22,7 +23,7 @@ namespace Knit
             if (Parent != null)
                 RequestRedraw();
 
-            UPF.Logger.Warning("During child redraw request on {Element} for {Child}: Could not queue redraw becase there is no parent!", this, child);
+            BSAMLCore.Logger.Warning("During child redraw request on {Element} for {Child}: Could not queue redraw becase there is no parent!", this, child);
         }
         protected virtual void RequestRedraw()
         {
