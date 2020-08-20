@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UnityPresentationFramework
+namespace Knit
 {
     internal class SystemReflectionReflector : IBindingReflector
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UnityPresentationFramework
+namespace Knit
 {
     public delegate object? ValueGetter(object thisObj);
     public delegate void ValueSetter(object thisObj, object? value);

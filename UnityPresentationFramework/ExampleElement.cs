@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace UnityPresentationFramework
+namespace Knit
 {
     public class ExampleElement : Element<ExampleElement>
     {

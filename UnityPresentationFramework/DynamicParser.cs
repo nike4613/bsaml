@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 using System.Windows.Markup;
 using System.Xaml;
 using System.Xml;
-using UnityPresentationFramework.Parsing;
+using Knit.Parsing;
 
-[assembly: XmlnsDefinition("upf", nameof(UnityPresentationFramework))]
+[assembly: XmlnsDefinition("upf", nameof(Knit))]
 
-namespace UnityPresentationFramework
+namespace Knit
 {
     public class DynamicParser
     {

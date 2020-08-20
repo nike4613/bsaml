@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xaml;
 
-namespace UnityPresentationFramework.Parsing
+namespace Knit.Parsing
 {
     internal class UpfXamlSchemaContext : XamlSchemaContext
     {

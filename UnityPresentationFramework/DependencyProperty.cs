@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 
-namespace UnityPresentationFramework
+namespace Knit
 {
     public delegate bool ValidateValue<in TOwner, in T>(TOwner owner, T value) where TOwner : DependencyObject;
     public delegate void PropertyChanged<in TOwner, in T>(TOwner owner, T value) where TOwner : DependencyObject;

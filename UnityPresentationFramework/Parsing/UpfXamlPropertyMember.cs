@@ -8,7 +8,7 @@ using System.Windows.Markup;
 using System.Xaml;
 using System.Xaml.Schema;
 
-namespace UnityPresentationFramework.Parsing
+namespace Knit.Parsing
 {
     internal class UpfXamlPropertyMember : XamlMember, IProvideValueTarget
     {

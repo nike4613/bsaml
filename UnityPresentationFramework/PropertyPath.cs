@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UnityPresentationFramework
+namespace Knit
 {
     [DebuggerDisplay("{System.String.Join(\".\", components)}")]
     public class PropertyPath

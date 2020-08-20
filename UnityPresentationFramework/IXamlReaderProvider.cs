@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xaml;
 
-namespace UnityPresentationFramework
+namespace Knit
 {
     public interface IXamlReaderProvider
     {

@@ -7,7 +7,7 @@ using System.Text;
 
 using GameObject = System.Object;
 
-namespace UnityPresentationFramework
+namespace Knit
 {
     public abstract class Element : DependencyObject, ICollection<Element>
     {

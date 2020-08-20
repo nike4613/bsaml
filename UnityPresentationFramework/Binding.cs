@@ -8,9 +8,9 @@ using System.Windows.Markup;
 using System.Xaml;
 using System.Reflection;
 using System.Diagnostics;
-using UnityPresentationFramework.Parsing;
+using Knit.Parsing;
 
-namespace UnityPresentationFramework
+namespace Knit
 {
     public enum BindingDirection
     {

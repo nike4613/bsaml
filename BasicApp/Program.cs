@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
-using UnityPresentationFramework;
+using Knit;
 
 namespace BasicApp
 {
@@ -9,12 +9,12 @@ namespace BasicApp
     {
         static void Main(string[] args)
         {
-            var obj = UPF.Parser.ParseXaml(Xaml);
+            var obj = Knit.UPF.Parser.ParseXaml(Xaml);
 
             var dataCtx = obj.First().First().DataContext;
             dataCtx = obj.Skip(1).First().DataContext;
 
-            UPF.Close();
+            Knit.UPF.Close();
         }
 
         public static DataObject GlobalDataContext { get; } = new DataObject();

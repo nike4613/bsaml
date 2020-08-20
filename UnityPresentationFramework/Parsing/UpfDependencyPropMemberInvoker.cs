@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xaml.Schema;
 
-namespace UnityPresentationFramework.Parsing
+namespace Knit.Parsing
 {
     internal class UpfDependencyPropMemberInvoker : XamlMemberInvoker
     {
