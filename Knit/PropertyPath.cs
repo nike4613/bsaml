@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -53,20 +54,27 @@ namespace Knit
             entry.Setter(target, value);
         }
 
-        // TODO: maybe just store a list of objects that we've bound a handler to so we can always unsub from all of them?
-        private readonly ConditionalWeakTable<Action<object?>, ConditionalWeakTable<object, PropertyChangedEventHandler>> handlerDelegates
-            = new ConditionalWeakTable<Action<object?>, ConditionalWeakTable<object, PropertyChangedEventHandler>>();
+        private struct Empty { }
+        private readonly ConditionalWeakTable<object, ConcurrentDictionary<string, SubscribedProperty>> subscribedProperties
+            = new ConditionalWeakTable<object, ConcurrentDictionary<string, SubscribedProperty>>();
 
-        public bool AddChangedHandler(object target, Action<object?> handler)
+        private class SubscribedProperty
+        {
+            public readonly ConcurrentDictionary<ChangeHandler, Empty> Set = new ConcurrentDictionary<ChangeHandler, Empty>();
+            public PropertyChangedEventHandler? ExecutingHandler;
+        }
+
+        public delegate void ChangeHandler(object? value);
+
+        public bool AddChangedHandler(object target, ChangeHandler handler)
         {
             var entry = ForTargetObject(target);
-            var handlerMap = handlerDelegates.GetOrCreateValue(handler);
 
             bool result = false;
             object? obj = target;
             for (int i = 0; i < components.Length; i++)
             {
-                result = TryAddLayerChangedHandler(entry, handlerMap, i, obj, handler) || result;
+                result = TryAddLayerChangedHandler(entry, i, obj, handler) || result;
                 obj = Propagate(obj, entry.Stages[i]);
                 if (obj == null)
                     break;
@@ -76,38 +84,37 @@ namespace Knit
         }
 
         private bool TryAddLayerChangedHandler(
-            in CacheEntry entry, 
-            ConditionalWeakTable<object, PropertyChangedEventHandler> handlerMap, 
+            in CacheEntry entry,
             int layer, 
-            object obj, 
-            Action<object?> handler
+            object obj,
+            ChangeHandler handler
         )
         {
             if (obj is INotifyPropertyChanged notify)
             {
                 var propName = components[layer];
-
-                if (handlerMap.TryGetValue(obj, out _))
-                {
-                    logger.Warning("Trying to re-register the same changed handler to an object ({PathComponent} in {Path})", propName, this);
-                    return true;
-                }
+                var map = subscribedProperties.GetOrCreateValue(obj);
+                var handlers = map.GetOrAdd(propName, _ => new SubscribedProperty());
 
                 var stages = entry.Stages;
-                var propHandler = new PropertyChangedEventHandler((sender, args) =>
+                if (handlers.Set.Count == 0)
                 {
-                    if (args.PropertyName == propName)
+                    handlers.ExecutingHandler = (sender, args) =>
                     {
-                        var obj = sender;
-                        for (int i = layer + 1; i < components.Length; i++)
+                        if (map.TryGetValue(args.PropertyName, out var prop))
                         {
-                            obj = Propagate(obj, stages[i]);
+                            var obj = sender;
+                            for (int i = layer; i < components.Length; i++)
+                            {
+                                obj = Propagate(obj, stages[i]);
+                            }
+                            foreach (var handler in prop.Set)
+                                handler.Key(obj);
                         }
-                        handler(obj);
-                    }
-                });
-                handlerMap.Add(obj, propHandler);
-                notify.PropertyChanged += propHandler;
+                    };
+                    notify.PropertyChanged += handlers.ExecutingHandler;
+                }
+                handlers.Set.AddOrUpdate(handler, new Empty(), (h, e) => e);
 
                 return true;
             }
@@ -115,15 +122,14 @@ namespace Knit
             return false;
         }
 
-        public void RemoveChangedHandler(object target, Action<object?> handler)
+        public void RemoveChangedHandler(object target, ChangeHandler handler)
         {
             var entry = ForTargetObject(target);
-            var handlerMap = handlerDelegates.GetOrCreateValue(handler);
 
             object? obj = target;
             for (int i = 0; i < components.Length - 1; i++)
             {
-                TryRemoveLayerChangedHandler(handlerMap, i, obj);
+                TryRemoveLayerChangedHandler(handler, i, obj);
                 obj = Propagate(obj, entry.Stages[i]);
                 if (obj == null)
                     break;
@@ -131,7 +137,7 @@ namespace Knit
         }
 
         private bool TryRemoveLayerChangedHandler(
-            ConditionalWeakTable<object, PropertyChangedEventHandler> handlerMap,
+            ChangeHandler handler,
             int layer,
             object obj
         )
@@ -140,11 +146,16 @@ namespace Knit
             {
                 var propName = components[layer];
 
-                if (!handlerMap.TryGetValue(obj, out var handler))
+                if (!subscribedProperties.TryGetValue(obj, out var dict))
+                    return false;
+                if (!dict.TryGetValue(propName, out var subProp))
                     return false;
 
-                handlerMap.Remove(obj);
-                notify.PropertyChanged += handler;
+                subProp.Set.TryRemove(handler, out _);
+                if (subProp.Set.Count == 0)
+                {
+                    notify.PropertyChanged -= subProp.ExecutingHandler;
+                }
 
                 return true;
             }

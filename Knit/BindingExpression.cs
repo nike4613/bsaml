@@ -57,9 +57,10 @@ namespace Knit
                 {
                     if (lastContext != null)
                         Path.RemoveChangedHandler(lastContext, OnValueChanged);
-                    Path.AddChangedHandler(context, OnValueChanged);
                     lastContext = context;
                 }
+
+                Path.AddChangedHandler(context, OnValueChanged);
             }
 
             lastContext = context;

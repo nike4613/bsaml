@@ -11,8 +11,9 @@ namespace BasicApp
         {
             var obj = BSAMLCore.Parser.ParseXaml(Xaml);
 
-            var dataCtx = obj.First().First().DataContext;
-            dataCtx = obj.Skip(1).First().DataContext;
+            GlobalDataContext.DoTheThingChanged();
+            GlobalDataContext.FirstThing.ThingChanged();
+            GlobalDataContext.FirstThingChanged();
 
             BSAMLCore.Close();
         }
@@ -24,15 +25,19 @@ namespace BasicApp
             public string DoTheThing => "Hello!";
             public string DataContextIsInherited => "The data context is inherited!";
 
-            public struct FirstThing_ : INotifyPropertyChanged
+            public class FirstThing_ : INotifyPropertyChanged
             {
                 public string Thing => "This is FirstThing.Thing";
 
+                public void ThingChanged() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Thing)));
+
                 public event PropertyChangedEventHandler? PropertyChanged;
             }
-            public FirstThing_ FirstThing => new FirstThing_();
+            public FirstThing_ FirstThing { get; } = new FirstThing_();
 
             public event PropertyChangedEventHandler? PropertyChanged;
+            public void FirstThingChanged() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FirstThing)));
+            public void DoTheThingChanged() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DoTheThing)));
         }
 
         const string Xaml = @"
