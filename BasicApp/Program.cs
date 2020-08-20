@@ -28,11 +28,11 @@ namespace BasicApp
             {
                 public string Thing => "This is FirstThing.Thing";
 
-                public event PropertyChangedEventHandler PropertyChanged;
+                public event PropertyChangedEventHandler? PropertyChanged;
             }
             public FirstThing_ FirstThing => new FirstThing_();
 
-            public event PropertyChangedEventHandler PropertyChanged;
+            public event PropertyChangedEventHandler? PropertyChanged;
         }
 
         const string Xaml = @"
