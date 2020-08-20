@@ -36,15 +36,16 @@ namespace BasicApp
         }
 
         const string Xaml = @"
-<ExampleElement xmlns=""upf""
+<ExampleElement xmlns=""bsaml""
+                xmlns:k=""knit""
                 xmlns:a=""clr-namespace:BasicApp;assembly=BasicApp""
                 xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml""
                 DataContext=""{x:Static a:Program.GlobalDataContext}"">
-    <ExampleElement Text=""{Binding DoTheThing}"">
-        <ExampleElement Text=""{Binding DataContextIsInherited}""/>
+    <ExampleElement Text=""{k:Binding DoTheThing}"">
+        <ExampleElement Text=""{k:Binding DataContextIsInherited}""/>
     </ExampleElement>
-    <ExampleElement Text=""{Binding FirstThing.Thing}"" ExampleElement.ScrollTarget=""true""/>
-    <ExampleElement DataContext=""{Binding FirstThing}"" Text=""{Binding Thing}"" />
+    <ExampleElement Text=""{k:Binding FirstThing.Thing}"" ExampleElement.ScrollTarget=""true""/>
+    <ExampleElement DataContext=""{k:Binding FirstThing}"" Text=""{k:Binding Thing}"" />
 </ExampleElement>
 ";
     }
