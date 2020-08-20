@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\UnityPresentationFramework\Knit.csproj" />
+    <ProjectReference Include="..\Knit\Knit.csproj" />
   </ItemGroup>
 
 </Project>
