@@ -64,7 +64,7 @@ namespace Knit
             public PropertyChangedEventHandler? ExecutingHandler;
         }
 
-        public delegate void ChangeHandler(object? value);
+        public delegate void ChangeHandler(object source, object? value);
 
         public bool AddChangedHandler(object target, ChangeHandler handler)
         {
@@ -74,7 +74,7 @@ namespace Knit
             object? obj = target;
             for (int i = 0; i < components.Length; i++)
             {
-                result = TryAddLayerChangedHandler(entry, i, obj, handler) || result;
+                result |= TryAddLayerChangedHandler(entry, i, obj, handler);
                 obj = Propagate(obj, entry.Stages[i]);
                 if (obj == null)
                     break;
@@ -109,7 +109,7 @@ namespace Knit
                                 obj = Propagate(obj, stages[i]);
                             }
                             foreach (var handler in prop.Set)
-                                handler.Key(obj);
+                                handler.Key(sender, obj);
                         }
                     };
                     notify.PropertyChanged += handlers.ExecutingHandler;

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Knit.Utility;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,18 +27,24 @@ namespace Knit
             Path = new PropertyPath(binding.Path.Split('.'), services);
         }
 
+        private DependencyProperty? attachedProperty;
+        internal void AttachProperty(DependencyProperty prop)
+        {
+            if (attachedProperty != null)
+                throw new InvalidOperationException();
+            attachedProperty = prop;
+        }
 
         private DependencyObject? lastObj;
-        private DependencyProperty? lastProp;
         private object? lastContext;
 
-        private void Refresh(DependencyObject obj, DependencyProperty toProp, bool targetPropChanged)
+        private void Refresh(DependencyObject obj, bool targetPropChanged, Maybe<object?> knownValue)
         {
-            if ((lastObj != null && lastObj != obj)
-             || (lastProp != null && lastProp != toProp))
+            if (attachedProperty == null)
+                throw new InvalidOperationException();
+            if (lastObj != null && lastObj != obj)
                 throw new ArgumentException("A BindingExpression can be registered to only one DependencyObject and DepenencyProperty");
             lastObj = obj;
-            lastProp = toProp;
 
             var context = Binding.Source ?? obj.DataContext;
             if (context == null)
@@ -45,13 +52,15 @@ namespace Knit
 
             if ((Binding.Direction & BindingDirection.OneWayToSource) != 0 && targetPropChanged)
             {
-                var value = obj.GetValue(toProp);
-                Path.SetValue(context, value);
+                var value = knownValue || Maybe.Some(obj.GetValue(attachedProperty));
+                Helpers.Assert(value.HasValue);
+                Path.SetValue(context, value.Value);
             }
             else if ((Binding.Direction & BindingDirection.OneWay) != 0)
             {
-                var value = Path.GetValue(context);
-                obj.SetValue(toProp, value);
+                var value = knownValue || Maybe.Some(Path.GetValue(context));
+                Helpers.Assert(value.HasValue);
+                obj.SetValue(attachedProperty, value.Value);
 
                 if (context != lastContext)
                 {
@@ -66,15 +75,15 @@ namespace Knit
             lastContext = context;
         }
 
-        internal void QueueRefresh(DependencyObject obj, DependencyProperty toProp, bool targetPropChanged)
+        internal void QueueRefresh(DependencyObject obj, bool targetPropChanged)
         {
-            Dispatcher.BeginInvoke(() => Refresh(obj, toProp, targetPropChanged));
+            Dispatcher.BeginInvoke(() => Refresh(obj, targetPropChanged, Maybe.None));
         }
 
-        private void OnValueChanged(object? value)
+        private void OnValueChanged(object source, object? value)
         {
             // TODO: somehow queue a refresh
-            QueueRefresh(lastObj!, lastProp!, false);
+            Dispatcher.BeginInvoke(() => Refresh(lastObj!, ReferenceEquals(source, lastObj!), Maybe.Some(value)));
         }
     }
 }

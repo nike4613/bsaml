@@ -76,6 +76,7 @@ namespace Knit
                 outBindings.Add(prop, binding);
             }
             allBindings.Add(binding, prop);
+            binding.AttachProperty(prop);
         }
 
         protected virtual void RequestBindingRefresh(bool includeOut)
@@ -87,7 +88,7 @@ namespace Knit
             foreach (var kvp in inBindings)
             {
                 if (!kvp.Key.Metadata.ExcludedFromDataContextRefresh || !isDataContextRefresh)
-                    kvp.Value.QueueRefresh(this, kvp.Key, false);
+                    kvp.Value.QueueRefresh(this, false);
             }
 
             if (includeOut)
@@ -95,7 +96,7 @@ namespace Knit
                 foreach (var kvp in outBindings)
                 {
                     if (!kvp.Key.Metadata.ExcludedFromDataContextRefresh || !isDataContextRefresh)
-                        kvp.Value.QueueRefresh(this, kvp.Key, true);
+                        kvp.Value.QueueRefresh(this, true);
                 }
             }
         }
@@ -137,7 +138,7 @@ namespace Knit
             propertyValues[prop] = value;
             if (outBindings.TryGetValue(prop, out var binding))
             {
-                binding.QueueRefresh(this, prop, true); // this should then propagate it up if needed
+                binding.QueueRefresh(this, true); // this should then propagate it up if needed
             }
             DependencyPropertyChanged?.Invoke(this, prop);
             if (invokeChanged)
