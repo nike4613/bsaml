@@ -2,12 +2,14 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Knit
 {
+    [DebuggerDisplay("Expression {Binding,nq} on {TargetObject} to {TargetProperty}")]
     public class BindingExpression
     {
         public Binding Binding { get; }
@@ -27,24 +29,27 @@ namespace Knit
             Path = new PropertyPath(binding.Path.Split('.'), services);
         }
 
+
+        public DependencyObject TargetObject => targetObj ?? throw new InvalidOperationException();
+        public DependencyProperty TargetProperty => attachedProperty ?? throw new InvalidOperationException();
+
+        private DependencyObject? targetObj;
         private DependencyProperty? attachedProperty;
-        internal void AttachProperty(DependencyProperty prop)
+        internal void AttachProperty(DependencyObject obj, DependencyProperty prop)
         {
-            if (attachedProperty != null)
+            if (attachedProperty != null || targetObj != null)
                 throw new InvalidOperationException();
             attachedProperty = prop;
+            targetObj = obj;
         }
-
-        private DependencyObject? lastObj;
         private object? lastContext;
 
         private void Refresh(DependencyObject obj, bool targetPropChanged, Maybe<object?> knownValue)
         {
-            if (attachedProperty == null)
+            if (attachedProperty == null || targetObj == null)
                 throw new InvalidOperationException();
-            if (lastObj != null && lastObj != obj)
+            if (!ReferenceEquals(obj, targetObj))
                 throw new ArgumentException("A BindingExpression can be registered to only one DependencyObject and DepenencyProperty");
-            lastObj = obj;
 
             var context = Binding.Source ?? obj.DataContext;
             if (context == null)
@@ -83,7 +88,7 @@ namespace Knit
         private void OnValueChanged(object source, object? value)
         {
             // TODO: somehow queue a refresh
-            Dispatcher.BeginInvoke(() => Refresh(lastObj!, ReferenceEquals(source, lastObj!), Maybe.Some(value)));
+            Dispatcher.BeginInvoke(() => Refresh(targetObj!, ReferenceEquals(source, targetObj!), Maybe.Some(value)));
         }
     }
 }

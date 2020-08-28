@@ -76,7 +76,7 @@ namespace Knit
                 outBindings.Add(prop, binding);
             }
             allBindings.Add(binding, prop);
-            binding.AttachProperty(prop);
+            binding.AttachProperty(this, prop);
         }
 
         protected virtual void RequestBindingRefresh(bool includeOut)

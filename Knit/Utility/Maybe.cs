@@ -1,6 +1,7 @@
 ﻿using System;
 using System.CodeDom;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,8 +16,11 @@ namespace Knit.Utility
         public static Maybe None { get; } = new Maybe();
     }
 
+    [DebuggerDisplay("{DebuggerView,nq}")]
     internal struct Maybe<T> : IEquatable<Maybe<T>>, IEquatable<T>
     {
+        private string DebuggerView => HasValue ? $"Some({Value})" : "None";
+
         public T Value { get; }
         public bool HasValue { get; }
 
@@ -49,6 +53,9 @@ namespace Knit.Utility
 
         public static explicit operator Maybe<T>(T value) => new Maybe<T>(value);
         public static implicit operator Maybe<T>(Maybe _) => None;
+
+        public override string ToString()
+            => HasValue ? Value?.ToString() ?? "" : "";
 
         public override bool Equals(object obj)
             => (obj is T t && Equals(t))
