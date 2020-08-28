@@ -59,7 +59,21 @@ namespace Knit
             propertyValues.Clear();
         }
 
-        private readonly Dictionary<BindingExpression, DependencyProperty> allBindings = new Dictionary<BindingExpression, DependencyProperty>();
+        private class BindingExpressionComparer : IComparer<BindingExpression>
+        {
+            public static BindingExpressionComparer Default { get; } = new BindingExpressionComparer();
+
+            public int Compare(BindingExpression x, BindingExpression y)
+            {
+                if (ReferenceEquals(x.DependsOn, y))
+                    return 1;
+                if (ReferenceEquals(y.DependsOn, x))
+                    return -1;
+                return x._Id - y._Id;
+            }
+        }
+
+        private readonly SortedDictionary<BindingExpression, DependencyProperty> allBindings = new SortedDictionary<BindingExpression, DependencyProperty>(BindingExpressionComparer.Default);
         private readonly Dictionary<DependencyProperty, BindingExpression> inBindings = new Dictionary<DependencyProperty, BindingExpression>();
         private readonly Dictionary<DependencyProperty, BindingExpression> outBindings = new Dictionary<DependencyProperty, BindingExpression>();
 
@@ -67,6 +81,7 @@ namespace Knit
 
         internal void RegisterBinding(BindingExpression binding, DependencyProperty prop)
         {
+            binding.AttachProperty(this, prop);
             if ((binding.Binding.Direction & BindingDirection.OneWay) != 0)
             {
                 inBindings.Add(prop, binding);
@@ -76,7 +91,6 @@ namespace Knit
                 outBindings.Add(prop, binding);
             }
             allBindings.Add(binding, prop);
-            binding.AttachProperty(this, prop);
         }
 
         protected virtual void RequestBindingRefresh(bool includeOut)
@@ -84,20 +98,14 @@ namespace Knit
 
         private void RequestRefreshes(bool includeOut, bool isDataContextRefresh)
         {
-            // TODO: need to figure out how to manage dependencies between bindings
-            foreach (var kvp in inBindings)
+            // ~~TODO~~: need to figure out how to manage dependencies between bindings
+            // ^^^^^^^^^ is managed by the SortedDictionary allBindings which always puts something that DependsOn something else first
+            foreach (var kvp in allBindings)
             {
-                if (!kvp.Key.Metadata.ExcludedFromDataContextRefresh || !isDataContextRefresh)
-                    kvp.Value.QueueRefresh(this, false);
-            }
-
-            if (includeOut)
-            {
-                foreach (var kvp in outBindings)
-                {
-                    if (!kvp.Key.Metadata.ExcludedFromDataContextRefresh || !isDataContextRefresh)
-                        kvp.Value.QueueRefresh(this, true);
-                }
+                var isOut = (kvp.Key.Binding.Direction & BindingDirection.OneWayToSource) != 0;
+                if (isOut && !includeOut) continue;
+                if (!kvp.Value.Metadata.ExcludedFromDataContextRefresh || !isDataContextRefresh)
+                    kvp.Key.QueueRefresh(this, isOut);
             }
         }
 

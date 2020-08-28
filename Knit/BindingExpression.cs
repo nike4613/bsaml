@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Knit
@@ -20,8 +21,14 @@ namespace Knit
 
         public PropertyPath Path { get; }
 
+        // This is needed so that I can have an absolute ordering of them
+        internal readonly int _Id;
+
+        private static int NextId = 0;
         public BindingExpression(Binding binding, IServiceProvider services)
         {
+            _Id = Interlocked.Increment(ref NextId) - 1;
+
             Binding = binding;
             Services = services;
             Reflector = services.GetRequiredService<IBindingReflector>();
@@ -29,6 +36,9 @@ namespace Knit
             Path = new PropertyPath(binding.Path.Split('.'), services);
         }
 
+        public DependencyProperty? DependsOn 
+            => ReferenceEquals(TargetProperty, DependencyObject.DataContextProperty)
+            ? null : DependencyObject.DataContextProperty;
 
         public DependencyObject TargetObject => targetObj ?? throw new InvalidOperationException();
         public DependencyProperty TargetProperty => attachedProperty ?? throw new InvalidOperationException();

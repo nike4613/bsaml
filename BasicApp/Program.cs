@@ -50,7 +50,7 @@ namespace BasicApp
         <ExampleElement Text=""{k:Binding DataContextIsInherited}""/>
     </ExampleElement>
     <ExampleElement Text=""{k:Binding FirstThing.Thing}"" ExampleElement.ScrollTarget=""true""/>
-    <ExampleElement DataContext=""{k:Binding FirstThing}"" Text=""{k:Binding Thing}"" />
+    <ExampleElement Text=""{k:Binding Thing}"" DataContext=""{k:Binding FirstThing}"" />
 </ExampleElement>
 ";
     }
