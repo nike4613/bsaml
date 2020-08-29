@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace System.Diagnostics.CodeAnalysis
 {
     [AttributeUsage(AttributeTargets.Parameter, Inherited = false)]
-    public sealed class DoesNotReturnIfAttribute : Attribute
+    internal sealed class DoesNotReturnIfAttribute : Attribute
     {
         public bool ParameterValue { get; }
         public DoesNotReturnIfAttribute(bool value) => ParameterValue = value;

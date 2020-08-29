@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Target Name="ILRepacker" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+  <Target Name="ILRepacker" AfterTargets="Build"><!--Condition="'$(Configuration)' == 'Release'">-->
 
     <ItemGroup>
       <InputAssemblies Include="$(OutputPath)$(TargetName)$(TargetExt)"/>
@@ -15,18 +15,25 @@
       <InputAssemblies Remove="**\System.Runtime.*" />
       <InputAssemblies Remove="**\System.Security.*" />
       <InputAssemblies Remove="**\System.Threading.Overlapped.*" />
+      
+      <InputAssemblies Remove="**\IPA.*" />
+      <InputAssemblies Remove="**\Unity*" />
     </ItemGroup>
-
+    
     <ILRepack
       Parallel="true"
       DebugInfo="true"
       Internalize="true"
+      XmlDocumentation="true"
+      Union="true"
+      LogFile="$(OutputPath)\ilrepack.log"
       InputAssemblies="@(InputAssemblies)"
       InternalizeExclude="Knit.*"
       TargetKind="SameAsPrimaryAssembly"
+      LibraryPath="$(OutputPath)"
       OutputFile="$(OutputPath)\$(AssemblyName)$(TargetExt)"
       />
-    
+
     <Delete Files="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />
     <ItemGroup>
       <Directories Include="$([System.IO.Directory]::GetDirectories('$(OutDir)%(DestinationSubDirectory)', '*', System.IO.SearchOption.AllDirectories))" />
