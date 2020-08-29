@@ -1,0 +1,18 @@
+﻿{
+  "$schema": "https://raw.githubusercontent.com/bsmg/BSIPA-MetadataFileSchema/master/Schema.json",
+  "name": "BSaML",
+  "id": "BSaML",
+  "version": "0.1.0",
+  "author": "DaNike",
+  "description": [
+    "#![BSAML.description.md]",
+    "A rewrite of BSML to be more like WPF, complete with bindings support and more."
+  ],
+  "gameVersion": "1.11.1",
+  "links": {
+    "donate": "https://ko-fi.com/danike"
+  },
+  "files": [
+    "Beat Saber_Data/Managed/System.Xaml.dll"
+  ]
+}

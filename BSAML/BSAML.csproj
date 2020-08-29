@@ -1,8 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Version>0.1.0</Version>
+    
     <TargetFramework>net471</TargetFramework>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="description.md" />
+    <None Remove="manifest.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="description.md" />
+    <EmbeddedResource Include="manifest.json" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Knit\Knit.csproj" />
