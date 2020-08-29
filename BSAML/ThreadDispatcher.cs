@@ -20,7 +20,7 @@ namespace BSAML
 
         public ThreadDispatcher(ILogger logger)
         {
-            Logger = logger;
+            Logger = logger.ForContext<ThreadDispatcher>();
             thread = new Thread(() => ExecutionThread())
             {
                 IsBackground = true

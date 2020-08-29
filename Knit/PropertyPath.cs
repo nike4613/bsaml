@@ -25,7 +25,7 @@ namespace Knit
             if (this.components.Length < 1)
                 throw new ArgumentException("PropertyPath must have at least one component", nameof(components));
             reflector = services.GetRequiredService<IBindingReflector>();
-            logger = services.GetRequiredService<ILogger>();
+            logger = services.GetRequiredService<ILogger>().ForContext<PropertyPath>();
         }
 
         public IEnumerable<string> Components => components;

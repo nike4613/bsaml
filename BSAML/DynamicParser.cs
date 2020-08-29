@@ -27,7 +27,7 @@ namespace BSAML
         {
             ReaderProvider = readerProvider;
             Services = services;
-            Logger = logger;
+            Logger = logger.ForContext<DynamicParser>();
         }
 
         public Element ParseXaml(string xaml)

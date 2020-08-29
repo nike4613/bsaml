@@ -12,7 +12,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BSAML", "BSAML\BSAML.csproj", "{E1D43FA0-B542-49D9-BF41-4BC40BBD954E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BSAML", "BSAML\BSAML.csproj", "{E1D43FA0-B542-49D9-BF41-4BC40BBD954E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildTools", "BuildTools", "{12A6A05D-B3BE-4684-AEE9-4F354C4BD04F}"
+	ProjectSection(SolutionItems) = preProject
+		Refs\refs.txt = Refs\refs.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
