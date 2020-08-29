@@ -1,4 +1,5 @@
 ﻿using IPA;
+using IPA.Loader;
 using IPA.Utilities.Async;
 using Knit;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,6 +32,17 @@ namespace BSAML
             this.logger = logger;
             scheduler = new UnityMainThreadTaskScheduler();
             services = PrepareServices();
+
+            PluginInitInjector.AddInjector(typeof(DynamicParser), (prev, param, meta) =>
+            {
+                if (prev != null) return prev;
+                var parser = new DynamicParser(
+                    services.GetRequiredService<IXamlReaderProvider>(),
+                    services.GetRequiredService<ILogger>().ForContext("ForPlugin", meta, false),
+                    services
+                );
+                return parser;
+            });
         }
 
         private IServiceProvider PrepareServices()
@@ -46,15 +58,15 @@ namespace BSAML
                     .Enrich.WithExceptionDetails()
                     .Enrich.WithDemystifiedStackTraces()
                     .Destructure.KnitTypes()
+                    .Destructure.AsScalar<PluginMetadata>()
                     .WriteTo.Sink(s.GetRequiredService<Plugin>())
                     .CreateLogger())
-                .AddSingleton<DynamicParser>();
+                .AddTransient<DynamicParser>();
 
             var provider = collection.BuildServiceProvider();
             if (!KnitServices.ValidateServices(provider))
                 throw new InvalidOperationException("Knit services not prepared correctly");
             return provider;
-
         }
 
         #region ILogEventSink implementation
@@ -77,8 +89,19 @@ namespace BSAML
                 _ => Do(() => logger.Warn($"Invalid Serilog level {logEvent.Level}"), IPALogger.Level.Info),
             };
             string prefix = "";
-            if (logEvent.Properties.TryGetValue("SourceContext", out var value))
-                prefix = $"{{{value}}}: ";
+
+            if (logEvent.Properties.TryGetValue("ForPlugin", out var value)
+                 && value is ScalarValue scalar
+                 && scalar.Value is PluginMetadata meta)
+            {
+                prefix += $"[{meta.Name}] ";
+            }
+
+            if (logEvent.Properties.TryGetValue("SourceContext", out value))
+            {
+                prefix += $"{{{value}}}: ";
+            }
+
             logger.Log(level, prefix + logEvent.RenderMessage());
             if (logEvent.Exception != null)
                 logger.Log(level, logEvent.Exception);

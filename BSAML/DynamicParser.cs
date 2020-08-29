@@ -23,7 +23,7 @@ namespace BSAML
         private readonly ILogger Logger;
         private readonly IServiceProvider Services;
 
-        public DynamicParser(IXamlReaderProvider readerProvider, ILogger logger, IServiceProvider services)
+        internal DynamicParser(IXamlReaderProvider readerProvider, ILogger logger, IServiceProvider services)
         {
             ReaderProvider = readerProvider;
             Services = services;
@@ -60,7 +60,7 @@ namespace BSAML
                 if (result == null)
                     throw new InvalidOperationException("Root element was not an Element");
 
-                result.Attach(Logger);
+                result.Attach(Services);
 
                 return result;
             }

@@ -1,4 +1,5 @@
 ﻿using Knit;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System;
 using System.Collections;
@@ -18,6 +19,9 @@ namespace BSAML
 
         public virtual Element? Parent { get; set; }
 
+        protected IDispatcher Dispatcher => services?.GetRequiredService<IDispatcher>() ?? throw new InvalidOperationException();
+
+        private IServiceProvider? services;
         private ILogger? logger;
 
         protected virtual void ChildNeedsRedraw(Element child) 
@@ -42,14 +46,18 @@ namespace BSAML
         protected virtual void RenderTo(GameObject parent) { }
 
         internal bool Constructed { get; private set; } = false;
-        internal void Attach(ILogger log)
+        internal void Attach(IServiceProvider services)
         {
-            logger = log.ForContext<Element>();
+            this.services = services;
+            logger = services.GetRequiredService<ILogger>().ForContext<Element>();
             Constructed = true;
             RequestBindingRefresh(true, false);
             foreach (var child in this)
-                child.Attach(log);
+                child.Attach(services);
+            GotServices(services);
         }
+
+        protected virtual void GotServices(IServiceProvider serivces) { }
 
         protected override sealed void RequestBindingRefresh(bool includeOut)
             => RequestBindingRefresh(includeOut, true);
