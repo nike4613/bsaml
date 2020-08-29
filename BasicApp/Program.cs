@@ -9,13 +9,13 @@ namespace BasicApp
     {
         static void Main(string[] args)
         {
-            var obj = BSAMLCore.Parser.ParseXaml(Xaml);
+            /*var obj = BSAMLCore.Parser.ParseXaml(Xaml);
 
             GlobalDataContext.DoTheThingChanged();
             GlobalDataContext.FirstThing.ThingChanged();
             GlobalDataContext.FirstThingChanged();
 
-            BSAMLCore.Close();
+            BSAMLCore.Close();*/
         }
 
         public static DataObject GlobalDataContext { get; } = new DataObject();

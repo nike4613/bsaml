@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace BSAML
 {
-    public static class BSAMLCore
+    /*public static class BSAMLCore
     {
         private static IServiceProvider CreateServices()
         {
@@ -41,5 +41,5 @@ namespace BSAML
         internal static IDispatcher Dispatcher => Services.GetRequiredService<IDispatcher>();
 
         public static DynamicParser Parser => Services.GetRequiredService<DynamicParser>();
-    }
+    }*/
 }

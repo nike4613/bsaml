@@ -52,13 +52,8 @@ namespace BSAML
             //var realReader = new UpfPostprocessingXamlReader(xreader, Reflector);
             using var objWriter = new XamlObjectWriter(xreader.SchemaContext, ReaderProvider.SettingsWithRoot(null));
 
-            var dispatcher = Services.GetRequiredService<IDispatcher>();
-
-            var waitHandle = new ManualResetEventSlim(false);
             try
             {
-                dispatcher.BeginInvoke(() => waitHandle.Wait()); // ensure no queued actions happen until we're done
-
                 XamlServices.Transform(xreader, objWriter);
 
                 var result = objWriter.Result as Element;
@@ -77,8 +72,6 @@ namespace BSAML
             }
             finally
             {
-                waitHandle.Set();
-                dispatcher.Invoke(() => { }); // wait for the queue to finish
             }
         }
     }
