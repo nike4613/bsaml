@@ -13,8 +13,6 @@ using System.Xaml;
 using System.Xml;
 using Knit;
 
-[assembly: XmlnsDefinition("bsaml", nameof(BSAML))]
-
 namespace BSAML
 {
     public class DynamicParser

@@ -6,8 +6,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
+using System.Windows.Markup;
 using UnityEngine;
 using ILogger = Serilog.ILogger;
+
+[assembly: XmlnsDefinition("bsaml", nameof(BSAML))]
+[assembly: XmlnsDefinition("knit", nameof(Knit))]
 
 namespace BSAML
 {
