@@ -1,0 +1,15 @@
+﻿{
+  "$schema": "https://raw.githubusercontent.com/bsmg/BSIPA-MetadataFileSchema/master/Schema.json",
+  "name": "BSaML Test",
+  "id": "BSaML_test",
+  "version": "0.1.0",
+  "author": "DaNike",
+  "description": "a test for bsaml",
+  "gameVersion": "1.11.1",
+  "links": {
+    "donate": "https://ko-fi.com/danike"
+  },
+  "dependsOn": {
+    "BSaML": "^0.1.0"
+  }
+}
