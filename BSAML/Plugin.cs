@@ -49,7 +49,8 @@ namespace BSAML
         {
             var collection = new ServiceCollection()
                 .AddSingleton(this)
-                .AddKnitServices(withDefaultReflector: true)
+                .AddKnitServices(withDefaultReflector: false)
+                .AddScoped<IBindingReflector, BSIPAAccessorReflector>()
                 .AddSingleton<TaskScheduler, UnityMainThreadTaskScheduler>(s => s.GetRequiredService<Plugin>().scheduler)
                 .AddSingleton<TaskFactory>()
                 .AddSingleton<IDispatcher, TaskDispatcher>()

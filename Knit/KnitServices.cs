@@ -14,9 +14,9 @@ namespace Knit
     {
         public static IServiceCollection AddKnitServices(this IServiceCollection services, bool withDefaultReflector = true)
         {
-            services.AddSingleton<IXamlReaderProvider, KnitXamlReaderProvider>();
+            services.AddScoped<IXamlReaderProvider, KnitXamlReaderProvider>();
             if (withDefaultReflector)
-                services.AddSingleton<IBindingReflector, SystemReflectionReflector>();
+                services.AddScoped<IBindingReflector, SystemReflectionReflector>();
             return services;
         }
 
