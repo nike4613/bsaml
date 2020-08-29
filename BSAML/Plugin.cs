@@ -13,25 +13,32 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using UnityEngine;
+using UnityObject = UnityEngine.Object;
 using IPALogger = IPA.Logging.Logger;
+using ILogger = Serilog.ILogger;
 
 namespace BSAML
 {
     [Plugin(RuntimeOptions.DynamicInit)]
     internal class Plugin : ILogEventSink
     {
-        private readonly IPALogger logger;
+        private readonly IPALogger ipaLogger;
+        private readonly PluginMetadata ownMeta;
 
         private readonly IServiceProvider services;
+        private readonly ILogger logger;
 
         private readonly UnityMainThreadTaskScheduler scheduler;
 
         [Init]
-        public Plugin(IPALogger logger)
+        public Plugin(IPALogger logger, PluginMetadata meta)
         {
-            this.logger = logger;
+            ipaLogger = logger;
+            ownMeta = meta;
             scheduler = new UnityMainThreadTaskScheduler();
             services = PrepareServices();
+            this.logger = services.GetRequiredService<ILogger>().ForContext<Plugin>();
 
             PluginInitInjector.AddInjector(typeof(DynamicParser), (prev, param, meta) =>
             {
@@ -43,6 +50,42 @@ namespace BSAML
                 );
                 return parser;
             });
+        }
+
+        private class CoroHost : MonoBehaviour { }
+        private GameObject? schedulerHostObject;
+        private CoroHost? schedulerHost;
+
+        [OnEnable]
+        public void OnEnable()
+        {
+            logger.Debug("Creating scheduler host object");
+
+            schedulerHostObject = new GameObject(ownMeta.Name + " Dispatcher Scheduler Host");
+            UnityObject.DontDestroyOnLoad(schedulerHostObject);
+            schedulerHost = schedulerHostObject.AddComponent<CoroHost>();
+            UnityObject.DontDestroyOnLoad(schedulerHost);
+
+            // start the scheduler
+            schedulerHost.StartCoroutine(scheduler.Coroutine());
+
+            logger.Debug("Plugin enabled");
+        }
+
+        [OnDisable]
+        public async Task OnDisable()
+        {
+            logger.Debug("Destroying scheduler host object");
+
+            // cancel and wait for it to exit
+            scheduler.Cancel();
+            while (scheduler.IsRunning)
+                await Task.Yield();
+
+            UnityObject.Destroy(schedulerHost);
+            UnityObject.Destroy(schedulerHostObject);
+
+            logger.Debug("Plugin disabled");
         }
 
         private IServiceProvider PrepareServices()
@@ -87,7 +130,7 @@ namespace BSAML
                 LogEventLevel.Warning => IPALogger.Level.Warning,
                 LogEventLevel.Error => IPALogger.Level.Error,
                 LogEventLevel.Fatal => IPALogger.Level.Critical,
-                _ => Do(() => logger.Warn($"Invalid Serilog level {logEvent.Level}"), IPALogger.Level.Info),
+                _ => Do(() => ipaLogger.Warn($"Invalid Serilog level {logEvent.Level}"), IPALogger.Level.Info),
             };
             string prefix = "";
 
@@ -103,9 +146,9 @@ namespace BSAML
                 prefix += $"{{{value}}}: ";
             }
 
-            logger.Log(level, prefix + logEvent.RenderMessage());
+            ipaLogger.Log(level, prefix + logEvent.RenderMessage());
             if (logEvent.Exception != null)
-                logger.Log(level, logEvent.Exception);
+                ipaLogger.Log(level, logEvent.Exception);
         }
         #endregion
     }

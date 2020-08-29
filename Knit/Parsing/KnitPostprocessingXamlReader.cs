@@ -68,7 +68,6 @@ namespace Knit.Parsing
         {
             var declType = member.DeclaringType;
             var name = member.Name;
-            var attached = member.IsAttachable;
 
             var depProp = DependencyProperty.FromName(name, declType.UnderlyingType);
             if (depProp != null)

@@ -11,7 +11,7 @@ namespace BSAML
 {
     internal class BSIPAAccessorReflector : IBindingReflector
     {
-        private Dictionary<(Type type, string member), (ValueGetter get, ValueSetter set)> accessCache = new Dictionary<(Type type, string member), (ValueGetter get, ValueSetter set)>();
+        private readonly Dictionary<(Type type, string member), (ValueGetter get, ValueSetter set)> accessCache = new Dictionary<(Type type, string member), (ValueGetter get, ValueSetter set)>();
 
         public ValueGetter FindGetter(Type type, string member)
             => GetAccessors(type, member).get;
