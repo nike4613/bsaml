@@ -39,7 +39,7 @@ namespace Knit
             Logger = services.GetRequiredService<ILogger>().ForContext<BindingExpression>();
             Path = new PropertyPath(binding.Path.Split('.'), services);
 
-            Logger.Debug("Created BindingExpression for {Binding}", binding);
+            Logger.Verbose("Created BindingExpression for {@Binding} ({@Path})", Binding, Path);
         }
 
         public DependencyProperty? DependsOn 
@@ -71,7 +71,7 @@ namespace Knit
             if (context == null)
                 throw new NullReferenceException();
 
-            Logger.Debug("Refreshing binding {Binding} to {TargetObject} (direction {Direction})", Binding, obj, Binding.Direction);
+            Logger.Verbose("Refreshing binding {@Binding} to {@TargetObject} (direction {Direction})", Binding, obj, Binding.Direction);
 
             if ((Binding.Direction & BindingDirection.OneWayToSource) != 0 && targetPropChanged)
             {

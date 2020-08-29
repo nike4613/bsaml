@@ -12,6 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\Knit\_System.Diagnostics\CodeAnalysis.cs" Link="_System.Diagnostics\CodeAnalysis.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="description.md" />
     <EmbeddedResource Include="manifest.json" />
   </ItemGroup>

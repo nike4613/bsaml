@@ -2,11 +2,14 @@
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Knit.Parsing;
 using Serilog.Configuration;
+using Serilog.Core;
+using Serilog.Events;
 
 namespace Knit
 {
@@ -21,11 +24,27 @@ namespace Knit
         }
 
         public static LoggerConfiguration KnitTypes(this LoggerDestructuringConfiguration config)
-            => config.ByTransforming<PropertyPath>(p => new { p.Components });
+            => config.ByTransforming<PropertyPath>(p => new { p.Components })
+            .Destructure.With(new KnitDestructuringPolicy());
 
         public static bool ValidateServices(IServiceProvider services)
             => services.GetService<ILogger>() != null
             && services.GetService<IBindingReflector>() != null
             && services.GetService<IDispatcher>() != null;
+
+        private class KnitDestructuringPolicy : IDestructuringPolicy
+        {
+            public bool TryDestructure(object value, ILogEventPropertyValueFactory propertyValueFactory, [MaybeNullWhen(false)] out LogEventPropertyValue result)
+            {
+                if (value is DependencyProperty prop)
+                {
+                    result = propertyValueFactory.CreatePropertyValue(new { prop.Name, Type = prop.PropertyType, prop.OwningType });
+                    return true;
+                }
+
+                result = null;
+                return false;
+            }
+        }
     }
 }

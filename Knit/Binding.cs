@@ -45,7 +45,7 @@ namespace Knit
                 throw new InvalidOperationException("Could not locate reflector");
 
             var logger = schema.Services.GetRequiredService<ILogger>().ForContext<Binding>();
-            logger.Debug("Connecting binding {Binding}", this);
+            logger.Verbose("Connecting binding {@Binding}", this);
 
             var targetObject = targets.TargetObject;
 
@@ -55,8 +55,8 @@ namespace Knit
             if (!(targets.TargetProperty is DependencyProperty prop))
                 throw new InvalidOperationException("Cannot bind to a property that is not a DependencyProperty");
 
-            logger.Debug("Target object and property found: obj = {Object}, prop = {Property}", depObject, prop);
-            logger.Debug("Registering to dependency object");
+            logger.Verbose("Target object and property found: obj = {@Object}, prop = {@Property}", depObject, prop);
+            logger.Verbose("Registering to dependency object");
 
             depObject.RegisterBinding(new BindingExpression(this, schema.Services), prop);
 

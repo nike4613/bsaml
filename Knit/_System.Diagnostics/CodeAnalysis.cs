@@ -12,4 +12,12 @@ namespace System.Diagnostics.CodeAnalysis
         public bool ParameterValue { get; }
         public DoesNotReturnIfAttribute(bool value) => ParameterValue = value;
     }
+
+    [AttributeUsage(AttributeTargets.Parameter, Inherited = false)]
+    internal sealed class MaybeNullWhenAttribute : Attribute
+    {
+        public bool ReturnValue { get; }
+        public MaybeNullWhenAttribute(bool result) => ReturnValue = result;
+    }
+
 }

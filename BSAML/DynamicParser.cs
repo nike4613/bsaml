@@ -47,7 +47,7 @@ namespace BSAML
 
         private Element ReadFromReader(XamlReader xreader)
         {
-            Logger.Debug("Reading Xaml from {XamlReader}", typeof(XamlReader));
+            Logger.Verbose("Reading Xaml from {XamlReader}", typeof(XamlReader));
 
             using var objWriter = new XamlObjectWriter(xreader.SchemaContext, ReaderProvider.SettingsWithRoot(null));
 
@@ -59,8 +59,8 @@ namespace BSAML
                 if (result == null)
                     throw new InvalidOperationException("Root element was not an Element");
 
-                Logger.Debug("Got {Element}: {Object}", typeof(Element), result);
-                Logger.Debug("Attaching services");
+                Logger.Verbose("Got {Element}: {@Object}", typeof(Element), result);
+                Logger.Verbose("Attaching services");
 
                 result.Attach(Services);
 

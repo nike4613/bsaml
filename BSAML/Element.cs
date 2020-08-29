@@ -36,7 +36,7 @@ namespace BSAML
             }
             else
             {
-                logger?.Warning("During child redraw request on {Element} for {Child}: Could not queue redraw becase there is no parent!", this, child);
+                logger?.Warning("During child redraw request on {$Element} for {$Child}: Could not queue redraw becase there is no parent!", this, child);
             }
         }
         protected virtual void RequestRedraw()

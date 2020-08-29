@@ -17,11 +17,12 @@ using UnityEngine;
 using UnityObject = UnityEngine.Object;
 using IPALogger = IPA.Logging.Logger;
 using ILogger = Serilog.ILogger;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BSAML
 {
     [Plugin(RuntimeOptions.DynamicInit)]
-    internal class Plugin : ILogEventSink
+    internal class Plugin : ILogEventSink, IDestructuringPolicy
     {
         private readonly IPALogger ipaLogger;
         private readonly PluginMetadata ownMeta;
@@ -98,11 +99,16 @@ namespace BSAML
                 .AddSingleton<TaskFactory>()
                 .AddSingleton<IDispatcher, TaskDispatcher>()
                 .AddSingleton<ILogger>(s => new LoggerConfiguration()
+#if DEBUG
+                    .MinimumLevel.Verbose()
+#else
                     .MinimumLevel.Debug()
+#endif
                     .Enrich.WithExceptionDetails()
                     .Enrich.WithDemystifiedStackTraces()
                     .Destructure.KnitTypes()
                     .Destructure.AsScalar<PluginMetadata>()
+                    .Destructure.With(s.GetRequiredService<Plugin>())
                     .WriteTo.Sink(s.GetRequiredService<Plugin>())
                     .CreateLogger())
                 .AddTransient<DynamicParser>();
@@ -113,7 +119,27 @@ namespace BSAML
             return provider;
         }
 
-        #region ILogEventSink implementation
+#region IDestructuringPolicy implementation
+        bool IDestructuringPolicy.TryDestructure(object value, ILogEventPropertyValueFactory propertyValueFactory, [MaybeNullWhen(false)] out LogEventPropertyValue result)
+        {
+            if (value is Binding binding)
+            {
+                result = propertyValueFactory.CreatePropertyValue(binding, true);
+                return true;
+            }
+
+            if (value is Element element)
+            {
+                result = propertyValueFactory.CreatePropertyValue(new { Type = element.GetType(), Children = element.ToArray() }, true);
+                return true;
+            }
+
+            result = null;
+            return false;
+        }
+#endregion
+
+#region ILogEventSink implementation
         private static T Do<T>(Action thing, T val)
         {
             thing();
@@ -124,7 +150,7 @@ namespace BSAML
         {
             var level = logEvent.Level switch
             {
-                LogEventLevel.Verbose => IPALogger.Level.Trace,
+                LogEventLevel.Verbose => IPALogger.Level.Debug,
                 LogEventLevel.Debug => IPALogger.Level.Debug,
                 LogEventLevel.Information => IPALogger.Level.Info,
                 LogEventLevel.Warning => IPALogger.Level.Warning,
@@ -152,6 +178,6 @@ namespace BSAML
             if (logEvent.Exception != null)
                 ipaLogger.Log(level, logEvent.Exception);
         }
-        #endregion
+#endregion
     }
 }
