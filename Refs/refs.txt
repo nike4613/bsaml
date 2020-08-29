@@ -1,0 +1,13 @@
+::from bsinstalldir.txt
+"Beat Saber_Data/
+""Managed/
+"""Unity
+"""".TextMeshPro.dll
+""""Engine.
+"""""dll
+"""""CoreModule.dll
+"""""TextRenderingModule.dll
+"""""UI
+"""""".dll
+""""""Module.dll
+""""""ElementsModule.dll
