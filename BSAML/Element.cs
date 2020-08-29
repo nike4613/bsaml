@@ -5,8 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
-
-using GameObject = System.Object;
+using UnityEngine;
 
 namespace BSAML
 {
@@ -32,6 +31,8 @@ namespace BSAML
 
             Parent.ChildNeedsRedraw(this);
         }
+
+        protected virtual void RenderTo(GameObject parent) { }
 
         internal bool Constructed { get; private set; } = false;
         internal void Attach()
