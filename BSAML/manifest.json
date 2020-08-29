@@ -13,6 +13,7 @@
     "donate": "https://ko-fi.com/danike"
   },
   "files": [
-    "Beat Saber_Data/Managed/System.Xaml.dll"
+    "Beat Saber_Data/Managed/System.Xaml.dll",
+    "Beat Saber_Data/Managed/System.Windows.Extensions.dll"
   ]
 }
