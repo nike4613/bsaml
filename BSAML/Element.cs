@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
 using UnityEngine;
+using ILogger = Serilog.ILogger;
 
 namespace BSAML
 {
@@ -17,12 +18,18 @@ namespace BSAML
 
         public virtual Element? Parent { get; set; }
 
+        private ILogger? logger;
+
         protected virtual void ChildNeedsRedraw(Element child) 
         {
             if (Parent != null)
+            {
                 RequestRedraw();
-
-            BSAMLCore.Logger.Warning("During child redraw request on {Element} for {Child}: Could not queue redraw becase there is no parent!", this, child);
+            }
+            else
+            {
+                logger?.Warning("During child redraw request on {Element} for {Child}: Could not queue redraw becase there is no parent!", this, child);
+            }
         }
         protected virtual void RequestRedraw()
         {
@@ -35,12 +42,13 @@ namespace BSAML
         protected virtual void RenderTo(GameObject parent) { }
 
         internal bool Constructed { get; private set; } = false;
-        internal void Attach()
+        internal void Attach(ILogger log)
         {
+            logger = log.ForContext<Element>();
             Constructed = true;
             RequestBindingRefresh(true, false);
             foreach (var child in this)
-                child.Attach();
+                child.Attach(log);
         }
 
         protected override sealed void RequestBindingRefresh(bool includeOut)

@@ -65,7 +65,7 @@ namespace BSAML
                 if (result == null)
                     throw new InvalidOperationException("Root element was not an Element");
 
-                result.Attach();
+                result.Attach(Logger);
 
                 return result;
             }
