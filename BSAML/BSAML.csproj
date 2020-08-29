@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net471</TargetFramework>
@@ -16,6 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="IPA.Loader">
+      <HintPath>..\Refs\IPA.Loader.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
     <Reference Include="System.Xaml" />
     <Reference Include="Unity.TextMeshPro">
       <HintPath>..\Refs\Unity.TextMeshPro.dll</HintPath>
