@@ -1,5 +1,6 @@
 ﻿using Knit.Utility;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -19,6 +20,8 @@ namespace Knit
         public IDispatcher Dispatcher { get; }
         public IServiceProvider Services { get; }
 
+        internal ILogger Logger { get; }
+
         public PropertyPath Path { get; }
 
         // This is needed so that I can have an absolute ordering of them
@@ -33,7 +36,10 @@ namespace Knit
             Services = services;
             Reflector = services.GetRequiredService<IBindingReflector>();
             Dispatcher = services.GetRequiredService<IDispatcher>();
+            Logger = services.GetRequiredService<ILogger>().ForContext<BindingExpression>();
             Path = new PropertyPath(binding.Path.Split('.'), services);
+
+            Logger.Debug("Created BindingExpression for {Binding}", binding);
         }
 
         public DependencyProperty? DependsOn 
@@ -64,6 +70,8 @@ namespace Knit
             var context = Binding.Source ?? obj.DataContext;
             if (context == null)
                 throw new NullReferenceException();
+
+            Logger.Debug("Refreshing binding {Binding} to {TargetObject} (direction {Direction})", Binding, obj, Binding.Direction);
 
             if ((Binding.Direction & BindingDirection.OneWayToSource) != 0 && targetPropChanged)
             {
