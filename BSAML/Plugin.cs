@@ -141,9 +141,11 @@ namespace BSAML
                 prefix += $"[{meta.Name}] ";
             }
 
-            if (logEvent.Properties.TryGetValue("SourceContext", out value))
+            if (logEvent.Properties.TryGetValue("SourceContext", out value)
+                 && value is ScalarValue scalar2
+                 && scalar2.Value is string scontext)
             {
-                prefix += $"{{{value}}}: ";
+                prefix += $"{{{scontext}}}: ";
             }
 
             ipaLogger.Log(level, prefix + logEvent.RenderMessage());

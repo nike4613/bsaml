@@ -135,7 +135,7 @@ namespace Knit
             if (!valueFound)
             {
                 value = prop.DefaultValue;
-                propertyValues.Add(prop, value);
+                //propertyValues.Add(prop, value);
             }
 
             return value;

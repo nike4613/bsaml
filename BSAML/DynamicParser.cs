@@ -49,7 +49,8 @@ namespace BSAML
 
         private Element ReadFromReader(XamlReader xreader)
         {
-            //var realReader = new UpfPostprocessingXamlReader(xreader, Reflector);
+            Logger.Debug("Reading Xaml from {XamlReader}", typeof(XamlReader));
+
             using var objWriter = new XamlObjectWriter(xreader.SchemaContext, ReaderProvider.SettingsWithRoot(null));
 
             try
@@ -60,6 +61,9 @@ namespace BSAML
                 if (result == null)
                     throw new InvalidOperationException("Root element was not an Element");
 
+                Logger.Debug("Got {Element}: {Object}", typeof(Element), result);
+                Logger.Debug("Attaching services");
+
                 result.Attach(Services);
 
                 return result;
@@ -69,9 +73,6 @@ namespace BSAML
                 Logger.Fatal(e, "An error ocurred while parsing and constructing XAML");
 
                 throw new XamlParseException(e);
-            }
-            finally
-            {
             }
         }
     }
