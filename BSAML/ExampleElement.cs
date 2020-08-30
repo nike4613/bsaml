@@ -15,13 +15,7 @@ namespace BSAML
 
         private void TextChanged(string v)
         {
-            foreach (var c in this)
-            {
-                if (c.GetValue(ScrollTargetProperty))
-                {
-
-                }
-            }
+            logger?.Information("{@Property} on {@Element} set to {Value}", TextProperty, this, v);
         }
 
         public string Text

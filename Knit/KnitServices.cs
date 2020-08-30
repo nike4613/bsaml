@@ -38,7 +38,7 @@ namespace Knit
             {
                 if (value is DependencyProperty prop)
                 {
-                    result = propertyValueFactory.CreatePropertyValue(new { prop.Name, Type = prop.PropertyType, prop.OwningType });
+                    result = propertyValueFactory.CreatePropertyValue(new { prop.Name, Type = prop.PropertyType, prop.OwningType }, true);
                     return true;
                 }
 

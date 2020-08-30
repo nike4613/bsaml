@@ -71,7 +71,7 @@ namespace Knit
             if (context == null)
                 throw new NullReferenceException();
 
-            Logger.Verbose("Refreshing binding {@Binding} to {@TargetObject} (direction {Direction})", Binding, obj, Binding.Direction);
+            Logger.Verbose("Refreshing binding {@Binding} to {@TargetObject} on {@Property} (targetPropChanged: {PropChanged})", Binding, obj, attachedProperty, targetPropChanged);
 
             if ((Binding.Direction & BindingDirection.OneWayToSource) != 0 && targetPropChanged)
             {

@@ -122,12 +122,6 @@ namespace BSAML
 #region IDestructuringPolicy implementation
         bool IDestructuringPolicy.TryDestructure(object value, ILogEventPropertyValueFactory propertyValueFactory, [MaybeNullWhen(false)] out LogEventPropertyValue result)
         {
-            if (value is Binding binding)
-            {
-                result = propertyValueFactory.CreatePropertyValue(binding, true);
-                return true;
-            }
-
             if (value is Element element)
             {
                 result = propertyValueFactory.CreatePropertyValue(new { Type = element.GetType(), Children = element.ToArray() }, true);

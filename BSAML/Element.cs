@@ -26,7 +26,7 @@ namespace BSAML
         protected IDispatcher Dispatcher => services?.GetRequiredService<IDispatcher>() ?? throw new InvalidOperationException();
 
         private IServiceProvider? services;
-        private ILogger? logger;
+        internal ILogger? logger;
 
         protected virtual void ChildNeedsRedraw(Element child) 
         {
