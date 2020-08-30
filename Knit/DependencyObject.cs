@@ -6,11 +6,16 @@ namespace Knit
 {
     public abstract class DependencyObject
     {
-        protected virtual DependencyObject? ParentObject => null;
+        protected internal virtual DependencyObject? ParentObject => null;
 
         public static readonly DependencyProperty<object?> DataContextProperty =
             DependencyProperty.Register<DependencyObject, object?>(nameof(DataContext), null,
-                onChange: (e, v) => e.RequestRefreshes(true, true),
+                onChange: (e, v) => 
+                    {
+                        e.refreshingDataContext = true;
+                        e.RequestBindingRefresh(true);
+                        e.refreshingDataContext = false;
+                    },
                 metadata: new DependencyMetadata { InheritsFromParent = true, ExcludedFromDataContextRefresh = true });
 
         public object? DataContext
@@ -93,20 +98,29 @@ namespace Knit
             allBindings.Add(binding, prop);
         }
 
-        protected virtual void RequestBindingRefresh(bool includeOut)
-            => RequestRefreshes(includeOut, false);
+        private bool refreshingDataContext = false;
 
-        private void RequestRefreshes(bool includeOut, bool isDataContextRefresh)
+        protected virtual void RequestBindingRefresh(bool includeOut)
         {
-            // TODO: need to figure out how to manage dependencies between bindings
-            // ^^^^^^^^^ is managed by the SortedDictionary allBindings which always puts something that DependsOn something else first
-            // that doesn't actually seem to work
-            foreach (var kvp in allBindings)
+            // TODO: figure out a better way to handle dependencies
+
+            if (!refreshingDataContext && inBindings.TryGetValue(DataContextProperty, out var dataCtxBinding))
             {
-                var isOut = (kvp.Key.Binding.Direction & BindingDirection.OneWayToSource) != 0;
-                if (isOut && !includeOut) continue;
-                if (!kvp.Value.Metadata.ExcludedFromDataContextRefresh || !isDataContextRefresh)
-                    kvp.Key.RefreshSync(this, isOut);
+                // Triggering a refresh for DataContext will set it, which in turn re-triggers RequestBindingRefresh
+                //   but with refreshingDataContext set. Therefore, since this is a synchronous update, all other
+                //   bindings will have been updated when this returns.
+                dataCtxBinding.RefreshSync(this, false);
+            }
+            else
+            {
+                foreach (var kvp in allBindings)
+                {
+                    if (kvp.Value == DataContextProperty) continue;
+                    var isOut = (kvp.Key.Binding.Direction & BindingDirection.OneWayToSource) != 0;
+                    if (isOut && !includeOut) continue;
+                    if (!kvp.Value.Metadata.ExcludedFromDataContextRefresh || !refreshingDataContext)
+                        kvp.Key.RefreshSync(this, isOut);
+                }
             }
         }
 

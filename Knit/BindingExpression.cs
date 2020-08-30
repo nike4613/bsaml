@@ -49,6 +49,8 @@ namespace Knit
         public DependencyObject TargetObject => targetObj ?? throw new InvalidOperationException();
         public DependencyProperty TargetProperty => attachedProperty ?? throw new InvalidOperationException();
 
+        private bool targetPropIsDataContext = false;
+
         private DependencyObject? targetObj;
         private DependencyProperty? attachedProperty;
         internal void AttachProperty(DependencyObject obj, DependencyProperty prop)
@@ -57,6 +59,7 @@ namespace Knit
                 throw new InvalidOperationException();
             attachedProperty = prop;
             targetObj = obj;
+            targetPropIsDataContext = prop == DependencyObject.DataContextProperty;
         }
         private object? lastContext;
 
@@ -67,13 +70,11 @@ namespace Knit
             if (!ReferenceEquals(obj, targetObj))
                 throw new ArgumentException("A BindingExpression can be registered to only one DependencyObject and DepenencyProperty");
 
-            var context = Binding.Source ?? obj.DataContext;
+            var context = Binding.Source ?? (targetPropIsDataContext ? obj.ParentObject?.DataContext : obj.DataContext);
             if (context == null)
                 throw new NullReferenceException();
 
             Logger.Verbose("Refreshing binding {@Binding} to {@TargetObject} on {@Property} (targetPropChanged: {PropChanged})", Binding, obj, attachedProperty, targetPropChanged);
-
-            Logger.Verbose("Stack: {$Stack}", new EnhancedStackTrace(new StackTrace(true)));
 
             if ((Binding.Direction & BindingDirection.OneWayToSource) != 0 && targetPropChanged)
             {
