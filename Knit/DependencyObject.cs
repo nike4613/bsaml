@@ -98,14 +98,15 @@ namespace Knit
 
         private void RequestRefreshes(bool includeOut, bool isDataContextRefresh)
         {
-            // ~~TODO~~: need to figure out how to manage dependencies between bindings
+            // TODO: need to figure out how to manage dependencies between bindings
             // ^^^^^^^^^ is managed by the SortedDictionary allBindings which always puts something that DependsOn something else first
+            // that doesn't actually seem to work
             foreach (var kvp in allBindings)
             {
                 var isOut = (kvp.Key.Binding.Direction & BindingDirection.OneWayToSource) != 0;
                 if (isOut && !includeOut) continue;
                 if (!kvp.Value.Metadata.ExcludedFromDataContextRefresh || !isDataContextRefresh)
-                    kvp.Key.QueueRefresh(this, isOut);
+                    kvp.Key.RefreshSync(this, isOut);
             }
         }
 

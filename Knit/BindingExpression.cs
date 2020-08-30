@@ -73,6 +73,8 @@ namespace Knit
 
             Logger.Verbose("Refreshing binding {@Binding} to {@TargetObject} on {@Property} (targetPropChanged: {PropChanged})", Binding, obj, attachedProperty, targetPropChanged);
 
+            Logger.Verbose("Stack: {$Stack}", new EnhancedStackTrace(new StackTrace(true)));
+
             if ((Binding.Direction & BindingDirection.OneWayToSource) != 0 && targetPropChanged)
             {
                 var value = knownValue || Maybe.Some(obj.GetValue(attachedProperty));
@@ -103,9 +105,13 @@ namespace Knit
             Dispatcher.BeginInvoke(() => Refresh(obj, targetPropChanged, Maybe.None));
         }
 
+        internal void RefreshSync(DependencyObject obj, bool targetPropChanged)
+        {
+            Dispatcher.Invoke(() => Refresh(obj, targetPropChanged, Maybe.None));
+        }
+
         private void OnValueChanged(object source, object? value)
         {
-            // TODO: somehow queue a refresh
             Dispatcher.BeginInvoke(() => Refresh(targetObj!, ReferenceEquals(source, targetObj!), Maybe.Some(value)));
         }
     }
