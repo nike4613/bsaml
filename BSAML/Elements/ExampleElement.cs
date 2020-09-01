@@ -2,8 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
+using UnityEngine;
 
-namespace BSAML
+namespace BSAML.Elements
 {
     public class ExampleElement : Element<ExampleElement>
     {
@@ -22,6 +24,22 @@ namespace BSAML
         {
             get => GetValue(TextProperty);
             set => SetValue(TextProperty, value);
+        }
+
+
+        protected override GameObject RenderToObject(LayoutInformation layout)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override Task<LayoutInformation> GetRequestedLayout()
+        {
+            return Task.FromResult(default(LayoutInformation));
+        }
+
+        protected override Task<LayoutInformation> TryWithLayout(LayoutInformation layout)
+        {
+            return Task.FromResult(layout);
         }
 
     }

@@ -6,12 +6,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Markup;
 using UnityEngine;
 using ILogger = Serilog.ILogger;
-
-[assembly: XmlnsDefinition("bsaml", nameof(BSAML))]
-[assembly: XmlnsDefinition("knit", nameof(Knit))]
 
 namespace BSAML
 {
@@ -39,6 +37,7 @@ namespace BSAML
                 logger?.Warning("During child redraw request on {$Element} for {$Child}: Could not queue redraw becase there is no parent!", this, child);
             }
         }
+
         protected virtual void RequestRedraw()
         {
             if (Parent == null)
@@ -47,7 +46,26 @@ namespace BSAML
             Parent.ChildNeedsRedraw(this);
         }
 
-        protected virtual void RenderTo(GameObject parent) { }
+        /// <summary>
+        /// Renders this <see cref="Element"/> to a <see cref="GameObject"/> that will be parented by this element's parent.
+        /// It should be sized appropriately according to <paramref name="layout"/>.
+        /// </summary>
+        /// <param name="layout">The <see cref="LayoutInformation"/> to use when rendering.</param>
+        /// <returns>A <see cref="GameObject"/> that contains the rendered element.</returns>
+        protected abstract GameObject RenderToObject(LayoutInformation layout);
+
+        /// <summary>
+        /// Gets this element's requested <see cref="LayoutInformation"/>.
+        /// </summary>
+        /// <returns>This element's requested <see cref="LayoutInformation"/>.</returns>
+        protected abstract Task<LayoutInformation> GetRequestedLayout();
+
+        /// <summary>
+        /// Evaluates the full <see cref="LayoutInformation"/> of this element based on <paramref name="layout"/>.
+        /// </summary>
+        /// <param name="layout">The <see cref="LayoutInformation"/> basis to try to fill.</param>
+        /// <returns>The corrected, absolutely valid <see cref="LayoutInformation"/>.</returns>
+        protected abstract Task<LayoutInformation> TryWithLayout(LayoutInformation layout);
 
         internal bool Constructed { get; private set; } = false;
         internal void Attach(IServiceProvider services)
@@ -63,6 +81,8 @@ namespace BSAML
 
         protected virtual void GotServices(IServiceProvider serivces) { }
 
+        protected virtual void BindingsRefreshed(bool refreshOutBindings) { }
+
         protected override sealed void RequestBindingRefresh(bool includeOut)
             => RequestBindingRefresh(includeOut, true);
 
@@ -77,6 +97,8 @@ namespace BSAML
                 foreach (var child in this)
                     child.RequestBindingRefresh(includeOut, refreshChildren);
             }
+
+            BindingsRefreshed(includeOut);
         }
         
         #region Implement ICollection<Element>

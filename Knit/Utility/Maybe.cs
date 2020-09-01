@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Knit.Utility
 {
-    internal class Maybe
+    public class Maybe
     {
         private Maybe() { }
 
@@ -17,7 +17,7 @@ namespace Knit.Utility
     }
 
     [DebuggerDisplay("{DebuggerView,nq}")]
-    internal struct Maybe<T> : IEquatable<Maybe<T>>, IEquatable<T>
+    public struct Maybe<T> : IEquatable<Maybe<T>>, IEquatable<T>
     {
         private string DebuggerView => HasValue ? $"Some({Value})" : "None";
 
