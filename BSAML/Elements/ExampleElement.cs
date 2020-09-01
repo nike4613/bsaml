@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace BSAML.Elements
 {
-    public class ExampleElement : Element<ExampleElement>
+    public class ExampleElement : ContainerElement<ExampleElement>
     {
         public static readonly DependencyProperty<string> TextProperty = 
             Properties.Register(nameof(Text), "", (e, v) => e.TextChanged(v));
@@ -32,14 +32,9 @@ namespace BSAML.Elements
             throw new NotImplementedException();
         }
 
-        protected override Task<LayoutInformation> GetRequestedLayout()
+        protected override Task<LayoutInformation> Measure(LayoutInformation? layout)
         {
-            return Task.FromResult(default(LayoutInformation));
-        }
-
-        protected override Task<LayoutInformation> TryWithLayout(LayoutInformation layout)
-        {
-            return Task.FromResult(layout);
+            return Task.FromResult(layout.GetValueOrDefault());
         }
 
     }

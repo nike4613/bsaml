@@ -13,13 +13,14 @@ using ILogger = Serilog.ILogger;
 
 namespace BSAML
 {
-    public abstract class Element : DependencyObject, ICollection<Element>
+    public abstract class Element : DependencyObject
     {
-        private readonly List<Element> children = new List<Element>();
-
         protected override sealed DependencyObject? ParentObject => Parent;
 
-        public virtual Element? Parent { get; set; }
+        public Element? Parent { get; private set; }
+
+        protected static void SetParent(Element target, Element? e) => target.SetParent(e);
+        protected virtual void SetParent(Element? e) => Parent = e;
 
         protected IDispatcher Dispatcher => services?.GetRequiredService<IDispatcher>() ?? throw new InvalidOperationException();
 
@@ -55,89 +56,40 @@ namespace BSAML
         protected abstract GameObject RenderToObject(LayoutInformation layout);
 
         /// <summary>
-        /// Gets this element's requested <see cref="LayoutInformation"/>.
+        /// Measure's this element's <see cref="LayoutInformation"/> 
         /// </summary>
-        /// <returns>This element's requested <see cref="LayoutInformation"/>.</returns>
-        protected abstract Task<LayoutInformation> GetRequestedLayout();
-
-        /// <summary>
-        /// Evaluates the full <see cref="LayoutInformation"/> of this element based on <paramref name="layout"/>.
-        /// </summary>
-        /// <param name="layout">The <see cref="LayoutInformation"/> basis to try to fill.</param>
-        /// <returns>The corrected, absolutely valid <see cref="LayoutInformation"/>.</returns>
-        protected abstract Task<LayoutInformation> TryWithLayout(LayoutInformation layout);
+        /// <param name="layout"></param>
+        /// <returns></returns>
+        protected abstract Task<LayoutInformation> Measure(LayoutInformation? layout);
 
         internal bool Constructed { get; private set; } = false;
-        internal void Attach(IServiceProvider services)
+        internal virtual void Attach(IServiceProvider services, bool refreshBindings = true)
         {
             this.services = services;
             logger = services.GetRequiredService<ILogger>().ForContext<Element>();
             Constructed = true;
-            RequestBindingRefresh(true, false);
-            foreach (var child in this)
-                child.Attach(services);
+
+            if (refreshBindings)
+                RequestBindingRefresh(true);
+
             GotServices(services);
         }
+
+        protected static void RequestBindingRefreshOn(Element element, bool includeOut)
+            => element.RequestBindingRefresh(includeOut);
 
         protected virtual void GotServices(IServiceProvider serivces) { }
 
         protected virtual void BindingsRefreshed(bool refreshOutBindings) { }
 
-        protected override sealed void RequestBindingRefresh(bool includeOut)
-            => RequestBindingRefresh(includeOut, true);
-
-        protected void RequestBindingRefresh(bool includeOut, bool refreshChildren = true)
+        protected override void RequestBindingRefresh(bool includeOut)
         {
             if (!Constructed) return;
 
             base.RequestBindingRefresh(includeOut);
-
-            if (refreshChildren)
-            {
-                foreach (var child in this)
-                    child.RequestBindingRefresh(includeOut, refreshChildren);
-            }
-
+            
             BindingsRefreshed(includeOut);
         }
-        
-        #region Implement ICollection<Element>
-        public virtual int Count => children.Count;
-
-        public virtual bool IsReadOnly => ((ICollection<Element>)children).IsReadOnly;
-
-        public virtual void Add(Element item)
-        {
-            item.Parent = this;
-            children.Add(item);
-        }
-
-        public virtual void Clear()
-        {
-            foreach (var c in children)
-                c.Parent = null;
-            children.Clear();
-        }
-
-        public virtual bool Contains(Element item) => children.Contains(item);
-
-        public virtual void CopyTo(Element[] array, int arrayIndex) => children.CopyTo(array, arrayIndex);
-
-        public virtual IEnumerator<Element> GetEnumerator() => children.GetEnumerator();
-
-        public virtual bool Remove(Element item)
-        {
-            if (children.Remove(item))
-            {
-                item.Parent = null;
-                return true;
-            }
-
-            return false;
-        }
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-        #endregion
     }
 
     public abstract class Element<T> : Element

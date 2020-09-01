@@ -28,24 +28,24 @@ namespace BSAML
             Logger = logger.ForContext<DynamicParser>();
         }
 
-        public Element ParseXaml(string xaml)
+        public RootElement ParseXaml(string xaml)
         {
             using var sreader = new StringReader(xaml);
             return ParseXaml(sreader);
         }
 
-        public Element ParseXaml(TextReader xamlReader)
+        public RootElement ParseXaml(TextReader xamlReader)
         {
             using var xreader = ReaderProvider.FromTextReader(xamlReader);
             return ReadFromReader(xreader);
         }
-        public Element ParseXaml(Stream xamlReader)
+        public RootElement ParseXaml(Stream xamlReader)
         {
             using var xreader = ReaderProvider.FromStream(xamlReader);
             return ReadFromReader(xreader);
         }
 
-        private Element ReadFromReader(XamlReader xreader)
+        private RootElement ReadFromReader(XamlReader xreader)
         {
             Logger.Verbose("Reading Xaml from {XamlReader}", typeof(XamlReader));
 
@@ -55,11 +55,11 @@ namespace BSAML
             {
                 XamlServices.Transform(xreader, objWriter);
 
-                var result = objWriter.Result as Element;
+                var result = objWriter.Result as RootElement;
                 if (result == null)
-                    throw new InvalidOperationException("Root element was not an Element");
+                    throw new InvalidOperationException("Root element was not a RootElement");
 
-                Logger.Verbose("Got {Element}: {@Object}", typeof(Element), result);
+                Logger.Verbose("Got {Element}: {@Object}", typeof(RootElement), result);
                 Logger.Verbose("Attaching services");
 
                 result.Attach(Services);
