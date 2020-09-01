@@ -58,17 +58,17 @@ namespace _BSAML_Test
         }
 
         const string Xaml = @"
-<ExampleElement xmlns=""bsaml""
-                xmlns:k=""knit""
-                xmlns:a=""clr-namespace:_BSAML_Test;assembly=_BSAML_Test""
-                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml""
-                DataContext=""{x:Static a:Plugin.GlobalDataContext}"">
+<TestRoot xmlns=""bsaml""
+          xmlns:k=""knit""
+          xmlns:a=""clr-namespace:_BSAML_Test;assembly=_BSAML_Test""
+          xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml""
+          DataContext=""{x:Static a:Plugin.GlobalDataContext}"">
     <ExampleElement Text=""{k:Binding DoTheThing}"">
         <ExampleElement Text=""{k:Binding DataContextIsInherited}""/>
     </ExampleElement>
     <ExampleElement Text=""{k:Binding FirstThing.Thing}"" ExampleElement.ScrollTarget=""true""/>
     <ExampleElement Text=""{k:Binding Thing}"" DataContext=""{k:Binding FirstThing}"" />
-</ExampleElement>
+</TestRoot>
 ";
     }
 }

@@ -9,6 +9,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Schema;
 
 namespace Knit
 {
@@ -31,7 +32,7 @@ namespace Knit
         public IEnumerable<string> Components => components;
 
         private const int maxCacheSize = 4;
-        private readonly Queue<CacheEntry> typeCache = new Queue<CacheEntry>(maxCacheSize + 1);
+        private readonly LinkedList<CacheEntry> typeCache = new LinkedList<CacheEntry>();
         private CacheEntry lastEntry;
     
         private struct CacheEntry
@@ -173,27 +174,23 @@ namespace Knit
 
         private void AddCacheItem(CacheEntry entry)
         {
-            typeCache.Enqueue(entry);
+            typeCache.AddFirst(entry);
             if (typeCache.Count > maxCacheSize)
-                typeCache.Dequeue();
+                typeCache.RemoveLast();
         }
 
         private CacheEntry GetOrCreateEntry(Type type)
         {
-            foreach (var entry in typeCache)
+            var node = typeCache.First;
+            while (node != null)
             {
-                if (type == entry.RootType)
+                if (node.Value.RootType == type)
                 {
-                    // we move the gotten entry to the front of the queue
-                    var allEntries = typeCache.Where(e => e.RootType != type).ToList();
-                    typeCache.Clear();
-                    foreach (var e in allEntries)
-                        AddCacheItem(e);
-                    AddCacheItem(entry);
-
-                    // then return
-                    return entry;
+                    typeCache.Remove(node);
+                    typeCache.AddFirst(node);
+                    return node.Value;
                 }
+                node = node.Next;
             }
 
             var newEntry = CreateEntry(type);
