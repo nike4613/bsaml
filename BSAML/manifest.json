@@ -12,6 +12,9 @@
   "links": {
     "donate": "https://ko-fi.com/danike"
   },
+  "dependsOn": {
+    "BSIPA": "^4.0.0"
+  }
   "files": [
     "Beat Saber_Data/Managed/System.Xaml.dll",
     "Beat Saber_Data/Managed/System.Windows.Extensions.dll"
