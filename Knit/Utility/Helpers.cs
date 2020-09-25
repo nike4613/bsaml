@@ -26,8 +26,8 @@ namespace Knit.Utility
         private interface IDefaultValue { object? Default { get; } }
         private class DefaultValue<T> : IDefaultValue
         {
-            private static T defVal = default!;
-            private static object? defObj = defVal;
+            private static readonly T defVal = default!;
+            private static readonly object? defObj = defVal;
             public object? Default => defObj;
         }
     }

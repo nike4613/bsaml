@@ -5,26 +5,32 @@ namespace BSAML
     public struct LayoutInformation
     {
         /// <summary>
-        /// The width of the layout object.
+        /// Gets the width of the layout object.
         /// </summary>
         /// <remarks>
         /// If this is <see langword="null"/> when it is provided to an <see cref="Element"/> to be sized,
         /// then this dimension is considered unconstrained.
         /// </remarks>
-        public int? Width { get; }
+        public float? Width { get; }
         /// <summary>
-        /// The height of the layout object.
+        /// Gets the height of the layout object.
         /// </summary>
         /// <remarks>
         /// If this is <see langword="null"/> when it is provided to an <see cref="Element"/> to be sized,
         /// then this dimension is considered unconstrained.
         /// </remarks>
-        public int? Height { get; }
+        public float? Height { get; }
 
-        public LayoutInformation(int? width, int? height)
+        /// <summary>
+        /// Gets the axis to prefer adjusting along, if any.
+        /// </summary>
+        public Axis PreferChangesAlong { get; }
+
+        public LayoutInformation(float? width, float? height, Axis preferChanges = Axis.None)
         {
             Width = width;
             Height = height;
+            PreferChangesAlong = preferChanges;
         }
     }
 }
