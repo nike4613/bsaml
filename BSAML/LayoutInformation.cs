@@ -1,8 +1,10 @@
 ﻿using Knit.Utility;
+using System;
+using System.Collections;
 
 namespace BSAML
 {
-    public struct LayoutInformation
+    public struct LayoutInformation : IEquatable<LayoutInformation>
     {
         /// <summary>
         /// Gets the width of the layout object.
@@ -32,5 +34,25 @@ namespace BSAML
             Height = height;
             PreferChangesAlong = preferChanges;
         }
+
+        public override bool Equals(object obj)
+            => obj is LayoutInformation lay && Equals(lay);
+
+        public bool Equals(LayoutInformation other)
+            => Width == other.Width && Height == other.Height && PreferChangesAlong == other.PreferChangesAlong;
+
+        public override int GetHashCode()
+        {
+            int hashCode = -645282706;
+            hashCode = hashCode * -1521134295 + Width.GetHashCode();
+            hashCode = hashCode * -1521134295 + Height.GetHashCode();
+            hashCode = hashCode * -1521134295 + PreferChangesAlong.GetHashCode();
+            return hashCode;
+        }
+
+        public static bool operator ==(LayoutInformation a, LayoutInformation b)
+            => a.Equals(b);
+        public static bool operator !=(LayoutInformation a, LayoutInformation b)
+            => !(a == b);
     }
 }

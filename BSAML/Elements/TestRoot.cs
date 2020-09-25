@@ -9,12 +9,17 @@ namespace BSAML.Elements
 {
     public class TestRoot : RootElement<TestRoot>
     {
-        protected override Task<LayoutInformation> Measure(LayoutInformation? layout)
+        public override Task<LayoutInformation> Measure(LayoutInformation? layout)
         {
             return Task.FromResult(layout.GetValueOrDefault());
         }
 
-        protected override GameObject RenderToObject(LayoutInformation layout)
+        public override GameObject RenderToObject(LayoutInformation layout)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task<GameObject> Render(LayoutInformation size)
         {
             throw new NotImplementedException();
         }

@@ -27,12 +27,12 @@ namespace BSAML.Elements
         }
 
 
-        protected override GameObject RenderToObject(LayoutInformation layout)
+        public override GameObject RenderToObject(LayoutInformation layout)
         {
             throw new NotImplementedException();
         }
 
-        protected override Task<LayoutInformation> Measure(LayoutInformation? layout)
+        public override Task<LayoutInformation> Measure(LayoutInformation? layout)
         {
             return Task.FromResult(layout.GetValueOrDefault());
         }

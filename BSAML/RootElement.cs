@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace BSAML
 {
@@ -11,6 +12,8 @@ namespace BSAML
     {
         protected override void SetParent(Element? e)
             => throw new InvalidOperationException("RootElement cannot be added as a child");
+
+        public abstract Task<GameObject> Render(LayoutInformation size);
 
     }
 

@@ -53,14 +53,14 @@ namespace BSAML
         /// </summary>
         /// <param name="layout">The <see cref="LayoutInformation"/> to use when rendering.</param>
         /// <returns>A <see cref="GameObject"/> that contains the rendered element.</returns>
-        protected abstract GameObject RenderToObject(LayoutInformation layout);
+        public abstract GameObject RenderToObject(LayoutInformation layout);
 
         /// <summary>
         /// Measure's this element's <see cref="LayoutInformation"/> 
         /// </summary>
         /// <param name="layout"></param>
         /// <returns></returns>
-        protected abstract Task<LayoutInformation> Measure(LayoutInformation? layout);
+        public abstract Task<LayoutInformation> Measure(LayoutInformation? layout);
 
         internal bool Constructed { get; private set; } = false;
         internal virtual void Attach(IServiceProvider services, bool refreshBindings = true)

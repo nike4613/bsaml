@@ -10,7 +10,7 @@ using UnityEngine.UI;
 
 namespace BSAML.Elements
 {
-    public class Text : Element<Text>
+    public class Text : Element<Text>, IDisposable
     {
         public static readonly DependencyProperty<string> ValueProperty
             = Properties.Register(nameof(Value), "", (e, v) => e.ValueChanged(v));
@@ -45,6 +45,7 @@ namespace BSAML.Elements
 
         private TextMeshProUGUI? tmp;
         private GameObject? rendered;
+        private bool disposedValue;
 
         private (TextMeshProUGUI tmp, GameObject obj) GetOrCreateObjects()
         {
@@ -65,7 +66,7 @@ namespace BSAML.Elements
 
                 var transform = tmp.rectTransform;
 
-                transform.anchorMin = transform.anchorMax = new Vector2(0.5f, 0.5f);
+                transform.anchorMin = transform.anchorMax = Vector2.zero;
                 transform.pivot = Vector2.zero;
 
                 tmp.text = Value;
@@ -84,7 +85,7 @@ namespace BSAML.Elements
             goto retry;
         }
 
-        protected override Task<LayoutInformation> Measure(LayoutInformation? layout)
+        public override Task<LayoutInformation> Measure(LayoutInformation? layout)
         {
             var (tmp, _) = GetOrCreateObjects();
 
@@ -111,11 +112,12 @@ namespace BSAML.Elements
             }
 
         tryLayout:
-            tmp.SetAllDirty();
-            tmp.ForceMeshUpdate();
+            // looking at the implementations, i'm pretty sure i have to call this twice 
+            tmp.CalculateLayoutInputHorizontal();
+            tmp.CalculateLayoutInputVertical();
 
-            var w = tmp.renderedWidth;
-            var h = tmp.renderedHeight;
+            var w = tmp.preferredWidth;
+            var h = tmp.preferredHeight;
 
             if (layout != null)
             {
@@ -135,7 +137,7 @@ namespace BSAML.Elements
             return Task.FromResult(new LayoutInformation(w, h));
         }
 
-        protected override GameObject RenderToObject(LayoutInformation layout)
+        public override GameObject RenderToObject(LayoutInformation layout)
         {
             var (tmp, obj) = GetOrCreateObjects();
 
@@ -152,6 +154,36 @@ namespace BSAML.Elements
             tmp.ForceMeshUpdate();
 
             return obj;
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+
+                }
+
+                if (tmp != null)
+                    GameObject.Destroy(tmp);
+                if (rendered != null)
+                    GameObject.Destroy(rendered);
+                disposedValue = true;
+            }
+        }
+
+        ~Text()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: false);
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }
