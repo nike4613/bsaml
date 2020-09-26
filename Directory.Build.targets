@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Target Name="CopyToPlugins" AfterTargets="$(CopyToPluginsDeps)">
+  <Target Name="CopyToPlugins" AfterTargets="$(CopyToPluginsDeps)" Condition="'$(CopyToPluginsDeps)' != ''">
     <PropertyGroup>
       <BeatSaberDir>$([System.IO.File]::ReadAllText(../bsinstalldir.txt))</BeatSaberDir>
       <OutputAssemblyName>$(OutputPath)$(AssemblyName)</OutputAssemblyName>

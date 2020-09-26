@@ -4,6 +4,7 @@
     <Version>0.1.0</Version>
     
     <TargetFramework>net472</TargetFramework>
+    <CopyToPluginsDeps>ILRepacker</CopyToPluginsDeps>
   </PropertyGroup>
 
   <ItemGroup>
@@ -58,7 +59,5 @@
       <HintPath>..\Refs\UnityEngine.UIModule.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <PropertyGroup>
-    <CopyToPluginsDeps>ILRepacker</CopyToPluginsDeps>
-  </PropertyGroup>
+  
 </Project>
