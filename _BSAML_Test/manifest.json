@@ -1,7 +1,7 @@
 ﻿{
   "$schema": "https://raw.githubusercontent.com/bsmg/BSIPA-MetadataFileSchema/master/Schema.json",
-  "name": "BSaML Test",
-  "id": "BSaML_test",
+  "name": "BSAML Test",
+  "id": "BSAML_test",
   "version": "0.1.0",
   "author": "DaNike",
   "description": "a test for bsaml",

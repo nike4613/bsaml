@@ -1,7 +1,7 @@
 ﻿{
   "$schema": "https://raw.githubusercontent.com/bsmg/BSIPA-MetadataFileSchema/master/Schema.json",
-  "name": "BSaML",
-  "id": "BSaML",
+  "name": "BSAML",
+  "id": "BSAML",
   "version": "0.1.0",
   "author": "DaNike",
   "description": [
