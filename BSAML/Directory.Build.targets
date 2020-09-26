@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="CopyToPlugins" AfterTargets="ILRepacker">
+    <PropertyGroup>
+      <BeatSaberDir>$([System.IO.File]::ReadAllText(../bsinstalldir.txt))</BeatSaberDir>
+      <OutputAssemblyName>$(OutputPath)$(AssemblyName)</OutputAssemblyName>
+      <PluginDir>$(BeatSaberDir)\Plugins</PluginDir>
+    </PropertyGroup>
+    <Error Text="Unable to copy assembly to game folder. BeatSaberDir doesn't exist: $(BeatSaberDir)" Condition="!Exists($(BeatSaberDir))"/>
+    <Message Text="Copying $(OutputPath)\$(AssemblyName).dll to $(PluginDir) folder" Importance="high" />
+    <Copy SourceFiles="$(OutputAssemblyName).dll" DestinationFiles="$(PluginDir)\$(AssemblyName).dll" />
+    <Copy SourceFiles="$(OutputAssemblyName).pdb" DestinationFiles="$(PluginDir)\$(AssemblyName).pdb" Condition="'$(Configuration)' == 'Debug'" />
+  </Target>
+</Project>
