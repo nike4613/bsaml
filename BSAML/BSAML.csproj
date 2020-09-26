@@ -58,5 +58,7 @@
       <HintPath>..\Refs\UnityEngine.UIModule.dll</HintPath>
     </Reference>
   </ItemGroup>
-  
+  <PropertyGroup>
+    <CopyToPluginsDeps>ILRepacker</CopyToPluginsDeps>
+  </PropertyGroup>
 </Project>

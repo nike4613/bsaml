@@ -50,5 +50,7 @@
       <Private>false</Private>
     </Reference>
   </ItemGroup>
-
+  <PropertyGroup>
+    <CopyToPluginsDeps>Build</CopyToPluginsDeps>
+  </PropertyGroup>
 </Project>
