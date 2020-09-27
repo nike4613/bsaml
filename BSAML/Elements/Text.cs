@@ -33,14 +33,16 @@ namespace BSAML.Elements
         {
             if (tmp != null)
                 tmp.text = text;
-            RequestRedraw(); // redraw needs to be requested because the measures may be changed
+            if (Constructed)
+                RequestRedraw(); // redraw needs to be requested because the measures may be changed
         }
 
         private void FontSizeChanged(int size)
         {
             if (tmp != null)
                 tmp.fontSize = size;
-            RequestRedraw();
+            if (Constructed)
+                RequestRedraw();
         }
 
         private TextMeshProUGUI? tmp;

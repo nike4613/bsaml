@@ -1,12 +1,19 @@
-﻿using BSAML;
+﻿using BeatSaberMarkupLanguage;
+using BS_Utils.Utilities;
+using BSAML;
+using BSAML.Elements;
+using HMUI;
 using IPA;
 using IPA.Logging;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
+using Logger = IPA.Logging.Logger;
 
 namespace _BSAML_Test
 {
@@ -33,6 +40,31 @@ namespace _BSAML_Test
             GlobalDataContext.DoTheThingChanged();
             GlobalDataContext.FirstThing.ThingChanged();
             GlobalDataContext.FirstThingChanged();
+
+            BSEvents.menuSceneActive += OnMenuLoaded;
+        }
+
+        [OnDisable]
+        public void OnDisable()
+        {
+            BSEvents.menuSceneActive -= OnMenuLoaded;
+        }
+
+        private void OnMenuLoaded()
+        {
+            SharedCoroutineStarter.instance.StartCoroutine(SetupCoro());
+        }
+
+        private IEnumerator SetupCoro()
+        {
+            yield return new WaitForSeconds(1f);
+
+            var parsed = (ViewPanel)Parser.ParseXaml(TestActualElements);
+
+            var presenter = BeatSaberUI.CreateViewController<PresenterVC>();
+            presenter.Panel = parsed;
+
+            Resources.FindObjectsOfTypeAll<MainFlowCoordinator>().First().InvokeMethod("PresentViewController", presenter, null, false);
         }
 
         public static DataObject GlobalDataContext { get; } = new DataObject();
@@ -69,6 +101,15 @@ namespace _BSAML_Test
     <ExampleElement Text=""{k:Binding FirstThing.Thing}"" ExampleElement.ScrollTarget=""true""/>
     <ExampleElement Text=""{k:Binding Thing}"" DataContext=""{k:Binding FirstThing}"" />
 </TestRoot>
+";
+
+        const string TestActualElements = @"
+<ViewPanel xmlns=""bsaml""
+           xmlns:k=""knit""
+           xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
+    <Text Value=""Hello, default text!"" />
+    <Text Value=""Big font!"" FontSize=""6"" />
+</ViewPanel>
 ";
     }
 }

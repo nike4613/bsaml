@@ -62,7 +62,7 @@ namespace BSAML
         /// <returns></returns>
         public abstract Task<LayoutInformation> Measure(LayoutInformation? layout);
 
-        internal bool Constructed { get; private set; } = false;
+        protected internal bool Constructed { get; private set; } = false;
         internal virtual void Attach(IServiceProvider services, bool refreshBindings = true)
         {
             this.services = services;

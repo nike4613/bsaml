@@ -1,4 +1,7 @@
 ::from bsinstalldir.txt
+"Plugins/
+""BSML.dll
+""BS_Utils.dll
 "::resolveInHere Libs/
 ""?optional
 "Beat Saber_Data/
@@ -16,3 +19,6 @@
 """""".dll
 """"""Module.dll
 """"""ElementsModule.dll
+"""Main.dll?virt
+"""HMUI.dll?virt
+"""HMLib.dll?virt
