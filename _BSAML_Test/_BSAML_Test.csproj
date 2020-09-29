@@ -42,6 +42,9 @@
       <HintPath>..\Refs\IPA.Loader.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <Reference Include="SiraUtil">
+      <HintPath>..\Refs\SiraUtil.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.TextMeshPro">
       <HintPath>..\Refs\Unity.TextMeshPro.dll</HintPath>
       <Private>false</Private>
@@ -69,6 +72,12 @@
     <Reference Include="UnityEngine.UIModule">
       <HintPath>..\Refs\UnityEngine.UIModule.dll</HintPath>
       <Private>false</Private>
+    </Reference>
+    <Reference Include="Zenject">
+      <HintPath>..\Refs\Zenject.dll</HintPath>
+    </Reference>
+    <Reference Include="Zenject-usage">
+      <HintPath>..\Refs\Zenject-usage.dll</HintPath>
     </Reference>
   </ItemGroup>
   

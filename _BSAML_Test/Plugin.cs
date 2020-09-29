@@ -5,6 +5,7 @@ using BSAML.Elements;
 using HMUI;
 using IPA;
 using IPA.Logging;
+using SiraUtil.Zenject;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -24,11 +25,13 @@ namespace _BSAML_Test
         public readonly DynamicParser Parser;
         
         [Init]
-        public Plugin(Logger logger, DynamicParser parser)
+        public Plugin(Logger logger, DynamicParser parser, Zenjector zenjector)
         {
             Logger = logger;
             Parser = parser;
             logger.Debug($"Initialized with {Parser}");
+
+            zenjector.OnMenu<BSAMLTestMenuInstaller>();
         }
 
         [OnEnable]
@@ -58,13 +61,13 @@ namespace _BSAML_Test
         private IEnumerator SetupCoro()
         {
             yield return new WaitForSeconds(1f);
-
+            /*
             var parsed = (ViewPanel)Parser.ParseXaml(TestActualElements);
 
             var presenter = BeatSaberUI.CreateViewController<PresenterVC>();
             presenter.Panel = parsed;
 
-            Resources.FindObjectsOfTypeAll<MainFlowCoordinator>().First().InvokeMethod("PresentViewController", presenter, null, false);
+            Resources.FindObjectsOfTypeAll<MainFlowCoordinator>().First().InvokeMethod("PresentViewController", presenter, null, false);*/
         }
 
         public static DataObject GlobalDataContext { get; } = new DataObject();
