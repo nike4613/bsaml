@@ -1,20 +1,17 @@
-﻿using HMUI;
-using BSAML;
-using UnityEngine;
-using BSAML.Elements;
-using System.Collections;
-using IPA.Utilities.Async;
+﻿using BSAML.Elements;
 using BSAML.ViewControllers;
 
 namespace _BSAML_Test
 {
-    internal class PresenterVC : PanelViewController
+    internal class PresenterVC : PanelViewController<ViewPanel>
     {
-        public override string? XAML => null;
-
-        protected override void DidActivate(bool firstActivation, ActivationType activationType)
-        {
-            base.DidActivate(firstActivation, activationType);
-        }
+        public override string? XAML => @"
+<ViewPanel xmlns=""bsaml""
+           xmlns:k=""knit""
+           xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
+    <Text Value=""Hello, default text!"" />
+    <Text Value=""Big font!"" FontSize=""20"" />
+</ViewPanel>
+";
     }
 }

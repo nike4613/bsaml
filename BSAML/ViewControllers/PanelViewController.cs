@@ -7,17 +7,17 @@ using IPA.Utilities.Async;
 
 namespace BSAML.ViewControllers
 {
-    public abstract class PanelViewController : ViewController
+    public abstract class PanelViewController<T> : ViewController where T : ViewPanel
     {
         [Inject] protected internal DynamicParser parser = null!;
 
         public abstract string? XAML { get; }
-        public ViewPanel Panel { get; set; } = null!;
+        public T Panel { get; set; } = null!;
 
         protected override void DidActivate(bool firstActivation, ActivationType activationType)
         {
             base.DidActivate(firstActivation, activationType);
-            Panel = (ViewPanel)parser.ParseXaml(XAML is null ? DefaultPanel : XAML); // An error page can also be rendered here if the parse fails.
+            Panel = (T)parser.ParseXaml(XAML is null ? DefaultPanel : XAML); // An error page can also be rendered here if the parse fails.
             Panel.DataContext = this;
             var width = rectTransform.rect.width;
             var height = rectTransform.rect.height;
