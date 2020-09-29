@@ -33,6 +33,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="HMUI">
+      <HintPath>..\Refs\HMUI.dll</HintPath>
+    </Reference>
     <Reference Include="IPA.Loader">
       <HintPath>..\Refs\IPA.Loader.dll</HintPath>
     </Reference>
