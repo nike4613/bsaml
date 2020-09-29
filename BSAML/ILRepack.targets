@@ -18,6 +18,10 @@
       
       <InputAssemblies Remove="**\IPA.*" />
       <InputAssemblies Remove="**\Unity*" />
+      <InputAssemblies Remove="**\Zenject*" />
+      <InputAssemblies Remove="**\SiraUtil.dll" />
+      <InputAssemblies Remove="**\HM*" />
+      <InputAssemblies Remove="**\Main.dll" />
     </ItemGroup>
     
     <ILRepack

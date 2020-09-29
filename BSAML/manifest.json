@@ -13,7 +13,8 @@
     "donate": "https://ko-fi.com/danike"
   },
   "dependsOn": {
-    "BSIPA": "^4.0.0"
+    "BSIPA": "^4.0.0",
+    "SiraUtil": "^2.0.0"
   },
   "files": [
     "Beat Saber_Data/Managed/System.Xaml.dll",

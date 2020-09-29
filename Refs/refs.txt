@@ -2,6 +2,7 @@
 "Plugins/
 ""BSML.dll
 ""BS_Utils.dll
+""SiraUtil.dll
 "::resolveInHere Libs/
 ""?optional
 "Beat Saber_Data/
@@ -22,3 +23,6 @@
 """Main.dll?virt
 """HMUI.dll?virt
 """HMLib.dll?virt
+"""Zenject
+""""-usage.dll
+"""".dll
