@@ -18,6 +18,8 @@ using UnityObject = UnityEngine.Object;
 using IPALogger = IPA.Logging.Logger;
 using ILogger = Serilog.ILogger;
 using System.Diagnostics.CodeAnalysis;
+using SiraUtil.Zenject;
+using BSAML.Installers;
 
 namespace BSAML
 {
@@ -33,7 +35,7 @@ namespace BSAML
         private readonly UnityMainThreadTaskScheduler scheduler;
 
         [Init]
-        public Plugin(IPALogger logger, PluginMetadata meta)
+        public Plugin(IPALogger logger, PluginMetadata meta, Zenjector zenjector)
         {
             ipaLogger = logger;
             ownMeta = meta;
@@ -51,6 +53,8 @@ namespace BSAML
                 );
                 return parser;
             });
+
+            zenjector.OnApp<BSAMLInstaller>().WithParameters(services);
         }
 
         private class CoroHost : MonoBehaviour { }

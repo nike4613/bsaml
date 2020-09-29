@@ -68,9 +68,5 @@
       <HintPath>..\Refs\Zenject-usage.dll</HintPath>
     </Reference>
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Installers\" />
-  </ItemGroup>
   
 </Project>
